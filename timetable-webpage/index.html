@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script defer src="./js/main.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="./styles/style.css">
+    
+    <title>Timetable</title>
+</head>
+<body>
+
+    <div class="burgerContainer" onclick="burger(this);">
+        <div class="topBun"></div>
+        <div class="burger"></div>
+        <div class="bottomBun"></div>
+    </div>
+    
+    <div id="main">
+        <div id="header" class="header">
+            <h1>Timetable</h1>
+        </div>
+
+        <div id="mySidebar" class="sidebar">
+            <a href="#">About</a>
+            <a href="#">Services</a>
+            <a href="#">Clients</a>
+            <a href="#">Contact</a>
+        </div>
+        
+        <div id="timetable" class="timetable">
+            <div class="dayHeaders">
+                <div class="dayHeader">Monday</div>
+                <div class="dayHeader">Tuesday</div>
+                <div class="dayHeader">Wednesday</div>
+                <div class="dayHeader">Thursday</div>
+                <div class="dayHeader">Friday</div>
+            </div>
+            
+            <div class="days">
+                <div id="monday" class="day">
+                    <div id="card1" class="card">
+                        <div class="cardTitle">
+                            This is an example card but longer
+                        </div>
+                        <div class="cardContent">
+                            this is the content 
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day">
+                    <div id="card2" class="card">
+                        <div class="cardTitle">
+                            This is an example card
+                        </div>
+                        <div class="cardContent">
+                            this is the content
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day">
+                    <div id="card3" class="card">
+                        <div class="cardTitle">
+                            This is an example card
+                        </div>
+                        <div class="cardContent">
+                            this is the content
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day">
+                    <div id="card4" class="card">
+                        <div class="cardTitle">
+                            This is an example card
+                        </div>
+                        <div class="cardContent">
+                            this is the content
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day">
+                    <div id="card5" class="card">
+                        <div class="cardTitle">
+                            This is an example card
+                        </div>
+                        <div class="cardContent">
+                            this is the content
+                        </div>
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </div>
+
+    <div id="bg-modal">
+        <div class="modal-content">
+            <form id="modal-form" action="">
+                <input class="modal-input-title" type="text" id="card-title" placeholder="Card Title">
+                <input class="modal-input-time" type="time" id="card-time">
+                <input class="modal-input-prof-name" type="text" id="card-prof-name" placeholder="professor name">
+                <textarea class="modal-input-desc" type="text" id="card-desc" placeholder="Card Description"></textarea>
+                <button class="modal-input-menu-btn" type="submit" onclick="submit">SUBMIT</button>
+                <button class="modal-input-menu-btn" type="cancel" onclick="cancel();">CANCEL</button>
+            </form>
+        </div>
+        
+    </div>
+    <div class="svg-container" id="plus-icon">
+        <img onclick="toggleForm();" src="./img/plus.svg">
+    </div>
+</body>
+
+</html>
