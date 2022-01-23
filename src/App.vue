@@ -1,15 +1,15 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
   <router-view></router-view>
-  <h1>HI</h1>
+  <Nav/>
 </template>
 
 <script>
-
+import Nav from './components/Nav.vue';
 
 export default {
   name: 'App',
   components: {
+    Nav
   }
 }
 </script>
