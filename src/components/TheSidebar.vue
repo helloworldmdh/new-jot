@@ -5,6 +5,6 @@
 
 <script>
 export default {
-  name: 'Nav'
+  name: 'TheSidebar'
 }
 </script>
