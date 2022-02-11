@@ -3,5 +3,6 @@ function loadPage (component) {
     return () => import(/* webpackChunkName:"[request]" */ `@/pages/${component}.vue`)
 }
 export default [
-    { path: '/', component: loadPage('Timetable') }
+    { path: '/', component: loadPage('Timetable') },
+    //copy and paste above with other page details to establish further routes
 ]

@@ -1,17 +1,21 @@
 <template>
+<TheSidebar/>  <!--sidebar component-->
+ <div :style="{ marginLeft: sidebarWidth}">
   <router-view></router-view>
-
-  <TheSidebar/>
+ </div>
 </template>
 
 <script>
-import TheSidebar from './components/TheSidebar.vue';
+import TheSidebar from './components/Sidebar/TheSidebar.vue';
+import { sidebarWidth } from './components/Sidebar/sidebar-state.js';
 
 export default {
   name: 'App',
   components: {
-    TheSidebar
-
+    TheSidebar 
+  },
+  setup() {
+    return {sidebarWidth}
   }
 }
 </script>
@@ -22,7 +26,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #50432c;
   margin-top: 60px;
 }
 </style>

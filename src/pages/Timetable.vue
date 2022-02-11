@@ -74,7 +74,11 @@ export default {
 <style scoped>
 
 .timetable-row {
-  height:2em
+  height:2em;
+  border-width: 2px;
+  margin-left: 10px;
+  border-right-color: #d4d4d4;
+  border-right-style: dashed;
 }
 
 
@@ -91,8 +95,8 @@ export default {
 } 
 
 
-/* #boxes{
-    display: table;
-} */
+#boxes{
+  position: relative;
+} 
 
 </style>
