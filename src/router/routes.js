@@ -4,5 +4,6 @@ function loadPage (component) {
 }
 export default [
     { path: '/', component: loadPage('Timetable') },
+    { path: '/Login', component: loadPage('Login')},
     //copy and paste above with other page details to establish further routes
 ]
