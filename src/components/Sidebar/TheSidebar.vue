@@ -9,9 +9,11 @@
       <h1 class="title">NewJot<br></h1>   <!--title when sidebar expands-->
 
       <SidebarLink id="icon-style" to="/"><box-icon name='calendar' size='lg' color='white' /></SidebarLink>
-      <SidebarLink id="icon-style" to="/timer"><box-icon name='timer' size='lg' color='white' /></SidebarLink>
+      <SidebarLink id="icon-style" to="/timer"> <box-icon name='time-five' size='lg' color='white' /></SidebarLink>
       <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='lg' color='white' /></SidebarLink>
-     
+
+      <SidebarLink id="bottom-icon" to="/settings"><box-icon name='cog' size='lg' color='white' /></SidebarLink>
+      <SidebarLink id="bottom-icon" to="/login"><box-icon name='log-out-circle' size='lg' color='white' /></SidebarLink>
      </span>
    </h1>
  </div>
@@ -37,7 +39,6 @@ export default {
 </script>
 
 <style scoped>
-
 .sidebar {
   color:#838383;
   background-color: #d4d4d4;
@@ -74,7 +75,14 @@ export default {
 }
 
 #icon-style{
-  margin-bottom: 2em;
+  margin-bottom: 1.5em;
   text-decoration: none;
+}
+
+#bottom-icon {
+  top: 15%;
+  bottom: 10px;
+  padding: 0em;
+  margin-bottom: 1em;
 }
 </style>
