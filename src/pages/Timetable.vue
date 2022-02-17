@@ -2,7 +2,11 @@
   <div v-for="(day) in timeArray" :key="day" class="timetable-column">
     <div v-for="(slot) in day" :key="slot" class="timetable-row">
       <div id="boxes">
-        <time-slot :lecture-title="slot.title"></time-slot> 
+        <time-slot 
+          :lecture-title="slot.title"
+          :lecturer="slot.lecturer"
+          :isEnabled="slot.enabled"
+        ></time-slot> 
       </div>
     </div>
   </div>
@@ -33,16 +37,40 @@ export default {
 
       for (var i = 0; i < 7; i++){
         for (var j = 0; j < 48; j++) {
-          array[i][j] = {
-            enabled: true,
-            continued: false,
-            title: "nice",
-            lecturer: "",
-            startTime: 0,
-            length: 0,
-            location: "",
-            module: ""
-          };
+          if ((Math.random()+((j-24)/48)) > 0.5){
+            array[i][j] = {
+              enabled: false,
+              continued: false,
+              title: "disabled",
+              lecturer: "name",
+              startTime: 0,
+              length: 0,
+              location: "",
+              module: ""
+            };
+          } else if (Math.random()< 0.1) {
+            array[i][j] = {
+              enabled: true,
+              continued: true,
+              title: "continued",
+              lecturer: "name",
+              startTime: 0,
+              length: 0,
+              location: "",
+              module: ""
+            };
+          } else {
+            array[i][j] = {
+              enabled: true,
+              continued: false,
+              title: "lecture",
+              lecturer: "name",
+              startTime: 0,
+              length: 0,
+              location: "",
+              module: ""
+            };
+          }
         }
       }
 
@@ -69,8 +97,11 @@ export default {
 <style scoped>
 
 .timetable-row {
-  height:2em;
-  display:block;
+
+  border-width: 2px;
+  margin-left: 0.1em;
+  border-right-color: #d4d4d4;
+  border-right-style: dashed;
 }
 
 
@@ -87,11 +118,8 @@ export default {
 } 
 
 
-  #boxes{
-    margin-left: 1em;
-    margin-bottom: 0.5em;
-    padding-left: 0.5em;
-    height: 3em;
-  } 
+#boxes{
+  position: relative;
+} 
 
 </style>
