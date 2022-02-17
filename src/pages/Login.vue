@@ -61,9 +61,10 @@ export default {
 }
 
 .page-form {
-    margin: 45rem;
+    margin: 30%;
+    margin-bottom: 10%;
     margin-top: 20px;
-    border-style: dashed;
+    border-style: none;
     border-color: #dce0e6;
     border-radius: 20px;
     padding:10px;

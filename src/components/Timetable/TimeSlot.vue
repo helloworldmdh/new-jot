@@ -95,11 +95,12 @@ export default {
 
     .continuous-slot{
         margin-left: 1em;
-        margin-bottom: 0.1em;
         padding-left: 1em;
         height: 3em;
         background-color: #A0E7E5;
         border-radius: 0.25em;
+        border-bottom-left-radius: 0em;
+        border-bottom-right-radius: 0em;
         font-size: 15px;
     }
 
