@@ -90,10 +90,8 @@ export default {
      */
     .time{
         margin-left: 1em;
-        margin-bottom: 0.1em;
         padding-left: 1em;
         height: 3em;
-        /* background-color: transparent; */
         border-radius: 0.35em;
         border-color: #e7b1a0;
         border-width: 2px;

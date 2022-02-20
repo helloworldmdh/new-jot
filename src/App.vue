@@ -1,6 +1,6 @@
 <template>
-<TheSidebar/>  <!--sidebar component-->
- <div :style="{ marginLeft: sidebarWidth}">
+<TheSidebar v-if="page"/>  <!--sidebar component-->
+ <div :style="{ marginLeft: computedLeftMargin}">
   <router-view></router-view>
  </div>
 </template>
@@ -15,8 +15,27 @@ export default {
     TheSidebar 
   },
   setup() {
-    return {sidebarWidth}
-  }
+    return { sidebarWidth }
+  },
+  computed:{
+    page(){
+      if (this.$route.path === '/login' || this.$route.path === '/')
+      {
+        return false;
+      }
+      return true;
+    },
+    computedLeftMargin(){
+      if (this.page){
+        return "0px";
+      }
+      else return sidebarWidth;
+    }
+  },
+  methods: {
+  },
+
+  
 }
 </script>
 
@@ -27,5 +46,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #50432c;
+  transition: 0.3s;
 }
 </style>

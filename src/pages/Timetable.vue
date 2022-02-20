@@ -1,24 +1,25 @@
 <template>
+  <div class="timetable">
+    <div class="time-column">
+        <time-slot v-for="i in 24" :key="i"
+        :lectureTitle="i-1+':00 - '+(i)+':00'"
+        :length="60"
+        :startTime="(i-1)*60"
+        :day="-1"
+        >
 
-  <div class="time-column">
-      <time-slot v-for="i in 24" :key="i"
-      :lectureTitle="i-1+':00 - '+(i)+':00'"
-      :length="60"
-      :startTime="(i-1)*60"
-      :day="-1"
-      >
-
-      </time-slot>
-  </div>
-  <div class="day" v-for="day in 7" :key="day">
-      <time-slot v-for="slot in timeSlots[day-1]" :key="slot.id"
-        :lecturer="slot.lecturer"
-        :lectureTitle="slot.lectureTitle"
-        :length="slot.length"
-        :startTime="slot.startTime"
-        :day="day-1"
-      >
-      </time-slot>
+        </time-slot>
+    </div>
+    <div class="day" v-for="day in 7" :key="day">
+        <time-slot v-for="slot in timeSlots[day-1]" :key="slot.id"
+          :lecturer="slot.lecturer"
+          :lectureTitle="slot.lectureTitle"
+          :length="slot.length"
+          :startTime="slot.startTime"
+          :day="day-1"
+        >
+        </time-slot>
+    </div>
   </div>
 
 </template>
