@@ -1,92 +1,86 @@
 <template>
-  <div v-for="(day) in timeArray" :key="day" class="timetable-column">
-    <div v-for="(slot) in day" :key="slot" class="timetable-row">
-      <div id="boxes">
-        <time-slot 
-          :lecture-title="slot.title"
-          :lecturer="slot.lecturer"
-          :isEnabled="slot.enabled"
-        ></time-slot> 
-      </div>
-    </div>
+
+  <div class="time-column">
+      <time-slot v-for="i in 24" :key="i"
+      :lectureTitle="i-1+':00 - '+(i)+':00'"
+      :length="60"
+      :startTime="(i-1)*60"
+      :day="-1"
+      >
+
+      </time-slot>
   </div>
+  <div class="day" v-for="day in 7" :key="day">
+      <time-slot v-for="slot in timeSlots[day-1]" :key="slot.id"
+        :lecturer="slot.lecturer"
+        :lectureTitle="slot.lectureTitle"
+        :length="slot.length"
+        :startTime="slot.startTime"
+        :day="day-1"
+      >
+      </time-slot>
+  </div>
+
 </template>
 
 <script>
 import TimeSlot from "../components/Timetable/TimeSlot.vue";
 
 export default {
-  mounted(){
-    this.createArray();
-  },
   name: 'Timetable',
+
   components: {
     TimeSlot,
   },
   methods: {
-    createArray() {
-      // let dayArray = [];
-     // dayArray.fill(this.time,0,47);
-     // this.timeArray.fill(dayArray, 0,6);
-      console.log("Attempt");
 
-      var array = new Array(7);
-      for(var k = 0; k < array.length; k++){
-        array[k] = new Array(48);
-      }
-
-      for (var i = 0; i < 7; i++){
-        for (var j = 0; j < 48; j++) {
-          if ((Math.random()+((j-24)/48)) > 0.5){
-            array[i][j] = {
-              enabled: false,
-              continued: false,
-              title: "disabled",
-              lecturer: "name",
-              startTime: 0,
-              length: 0,
-              location: "",
-              module: ""
-            };
-          } else if (Math.random()< 0.1) {
-            array[i][j] = {
-              enabled: true,
-              continued: true,
-              title: "continued",
-              lecturer: "name",
-              startTime: 0,
-              length: 0,
-              location: "",
-              module: ""
-            };
-          } else {
-            array[i][j] = {
-              enabled: true,
-              continued: false,
-              title: "lecture",
-              lecturer: "name",
-              startTime: 0,
-              length: 0,
-              location: "",
-              module: ""
-            };
-          }
-        }
-      }
-
-      this.timeArray = array;
-    },
-    changeTitle(i, j) {
-      this.timeArray[i][j].title = "not Nice"
-    },
-    changeContinuity(i, j){
-      this.timeArray[i][j].continued = !this.timeArray[i][j].continued;
-    }
+    
+  },
+  computed: {
 
   },
   data() {
     return {
       timeArray: [],
+      timeSlots:[
+        [
+          {
+            id: "lecture-0-540",
+            title: "lecture",
+            lecturer: "name",
+            day: 0,
+            startTime: 340,
+            endTime: 660,
+            length: 60,
+            location: "",
+            module: ""
+          },
+          {
+            id: "lecture-0-540",
+            title: "lecture",
+            lecturer: "name1",
+            day: 0,
+            startTime: 540,
+            endTime: 660,
+            length: 120,
+            location: "",
+            module: ""
+          }
+        ],
+        [
+          {
+            id: "lecture2-0-600",
+            title: "lecture2",
+            lecturer: "name2",
+            day: 1,
+            startTime: 800,
+            endTime: 660,
+            length: 30,
+            location: "",
+            module: ""
+          },
+        ]
+      ],
     }
   }
 }
@@ -96,30 +90,30 @@ export default {
 
 <style scoped>
 
-.timetable-row {
 
-  border-width: 2px;
-  margin-left: 0.1em;
+
+
+.day{
+  width: 13%;
+  float: left;
+  text-align: left;
+  position: relative;
   border-right-color: #d4d4d4;
   border-right-style: dashed;
+  height: 67em;
+  border-width: 2px;
 }
-
-
-.timetable-column{
+.time-column{
+  width: 9%;
   float: left;
-  width: 14%;
   text-align: left;
+  position: relative;
+  border-right-color: #d4d4d4;
+  border-right-style: dashed;
+  height: 67em;
+  border-width: 2px;
 }
 
-.timetable-row:after {
-  content: "";
-  display: table;
-  clear: both;
-} 
 
-
-#boxes{
-  position: relative;
-} 
 
 </style>

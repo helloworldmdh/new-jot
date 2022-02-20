@@ -1,15 +1,13 @@
 <template>
-    <div :class="slotStyle">
-        <div v-show="isEnabled">
+    <div :class="computedStyle" :style="{height: computedHeight, top: computedTop}">
+        <div>
             <div>
                 {{ lectureTitle }}
             </div>
             <div>
-
                 {{ lecturer }}
             </div>
-        </div>
-        
+        </div> 
     </div>
 </template>
 
@@ -33,6 +31,10 @@ export default {
             type: String,
             required: true,
         },
+        'startTime':{
+            type: Number,
+            required:true,
+        },
         'isEnabled': {
             type: Boolean,
             default: false,
@@ -41,69 +43,66 @@ export default {
             type: Boolean,
             default: false,
             required: false,
-        }
+        },
+        'day':{
+            type: Number,
+            required: true,
+        },
     },
     computed:{
-        slotStyle() {
-            if (this.isEnabled){
-                if (this.isContinued){
-                    return "continous-slot"
-                }
-                return "normal-slot"
-            }
-            return "empty-slot"
+        computedHeight(){
+            return `${(this.length/20)-0.3}em`
+        },
+        computedTop(){
+            return `${this.startTime/20}em`
+        },
+
+        computedStyle(){
+            if (this.day == -1) return 'time'
+            return 'normal-slot';
         }
     },
-    data() {
-        return {
-            // continued: this.isContinued,
-            // title: "nice",
-            // lecturer: "",
-            // startTime: 0,
-            // length: 0,
-            // location: "",
-            // module: "",
-            // enabled: this.isEnabled,
-        }
-    },
-    methods:{
-        
-    }
+
 }
 </script>
 
-<style>
+<style scoped>
+
+    /*
+    Style for all of the time slots on the timetable
+    */
     .normal-slot{
         margin-left: 1em;
         margin-bottom: 0.1em;
         padding-left: 1em;
         height: 3em;
         background-color: #A0E7E5;
-        border-radius: 0.25em;
+        border-radius: 0.35em;
         font-size: 15px;
+        position: absolute;
+        width:98%;
+        left:-0.95em;
     }
 
-    .empty-slot{
+
+    /**
+    Style for the time shown on the right side
+     */
+    .time{
         margin-left: 1em;
         margin-bottom: 0.1em;
         padding-left: 1em;
         height: 3em;
-        background-color: #ffffff;
-        border-radius: 0.25em;
+        /* background-color: transparent; */
+        border-radius: 0.35em;
+        border-color: #e7b1a0;
+        border-width: 2px;
+        border-style: solid;
         font-size: 15px;
+        position: absolute;
+        width:98%;
+        left:-0.95em;
     }
-
-    .continuous-slot{
-        margin-left: 1em;
-        margin-bottom: 0.1em;
-        padding-left: 1em;
-        height: 3em;
-        background-color: #A0E7E5;
-        border-radius: 0.25em;
-        font-size: 15px;
-    }
-
-
 
 
 </style>
