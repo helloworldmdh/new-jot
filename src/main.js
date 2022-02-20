@@ -8,7 +8,7 @@ import BaseCard from './components/UI/BaseCard.vue';
 
 let router = createRouter({
     history:createWebHistory(),
-    routes: routes,
+    routes,
 });
 
 
