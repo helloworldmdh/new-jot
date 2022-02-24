@@ -26,10 +26,12 @@ export default {
       return true;
     },
     computedLeftMargin(){
-      if (this.page){
+      if (!this.page){
         return "0px";
       }
-      else return sidebarWidth;
+      else {
+        return sidebarWidth.value;
+      }
     }
   },
   methods: {

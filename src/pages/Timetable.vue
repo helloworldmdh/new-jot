@@ -13,7 +13,7 @@
     <div class="day" v-for="day in 7" :key="day">
         <time-slot v-for="slot in timeSlots[day-1]" :key="slot.id"
           :lecturer="slot.lecturer"
-          :lectureTitle="slot.lectureTitle"
+          :lectureTitle="slot.title"
           :length="slot.length"
           :startTime="slot.startTime"
           :day="day-1"
