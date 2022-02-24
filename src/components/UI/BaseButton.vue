@@ -15,7 +15,6 @@ export default {
   display: block;
   width: 40%;
   height: 60px;
-  vertical-align: sub;
   max-width: 100%;
   margin: 0 auto;
   margin-bottom: 0;

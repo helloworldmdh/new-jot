@@ -74,8 +74,8 @@ export default {
 .sign-in-form {
     display: grid;
     padding-top: 20px;
-    padding-left:70px;
-    padding-right: 70px;
+    padding-left: 10%;
+    padding-right: 10%;
 }
 
 .sign-in-form input, .sign-in-form button {
@@ -89,7 +89,7 @@ button {
   color: #fff;
   text-align: center;
   font-size: 32px;
-  padding: 16px;
+  padding: 2%;
   transition: all 0.5s;
   cursor: pointer;
   box-shadow: 0 5px 10px -8px rgba(0, 0, 0,.7);
@@ -106,7 +106,7 @@ button:after {
   content: '»';
   position: absolute;
   opacity: 0;  
-  top: 14px;
+  top: 6%;
   right: -20px;
   transition: 0.5s;
 }
