@@ -1,5 +1,5 @@
 <template>
-    <div :class="computedStyle" :style="{height: computedHeight, top: computedTop}">
+    <div :class="computedStyle" :style="{'height': computedHeight, 'top': computedTop, 'margin-left': computedLeft}">
         <div>
             <div>
                 {{ lectureTitle }}
@@ -21,14 +21,14 @@ export default {
         },
         'lecturer':{
             type: String,
-            required: true,
+            required: false,
         },
         'location':{
             type: String,
-            required: true,
+            required: false,
         },
         'length':{
-            type: String,
+            type: Number,
             required: true,
         },
         'startTime':{
@@ -48,6 +48,10 @@ export default {
             type: Number,
             required: true,
         },
+        'indent':{
+            type: Number,
+            default: 0,
+        }
     },
     computed:{
         computedHeight(){
@@ -56,11 +60,15 @@ export default {
         computedTop(){
             return `${this.startTime/20}em`
         },
-
+        computedLeft(){
+            console.log(this.indent, this.lectureTitle)
+            return `${this.indent+1}em`
+        },
         computedStyle(){
             if (this.day == -1) return 'time'
             return 'normal-slot';
         }
+        
     },
 
 }
@@ -83,7 +91,6 @@ export default {
         width:98%;
         left:-0.95em;
     }
-
 
     /**
     Style for the time shown on the right side

@@ -81,9 +81,10 @@ export default {
 }
 
 #bottom-icon {
+  position: relative;
+  bottom: 2%;
   top: 15%;
-  bottom: 10px;
   padding: 0em;
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
 }
 </style>

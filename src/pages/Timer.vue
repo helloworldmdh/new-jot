@@ -24,6 +24,7 @@ export default {
     font-size: 56px;
     font-weight: 300;
     text-align: center;
+    margin-top: 2rem;
 } 
 
 </style>
