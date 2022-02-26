@@ -1,85 +1,126 @@
 <template>
-    <div class="login-page">
-        <h1>Nice to see you!</h1>
-        <div class="page-form">
-            <h3>{{signIn ? "Sign in" : "Sign up"}}</h3>
-            <div>
-                <form class="sign-in-form">
-                    <input v-model="login_email" type="email" placeholder="email" required />
-                    <input v-model="login_password" type="password" placeholder="password" required />
-                    <input v-if="!signIn" v-model="reg_confirmpassword" type="password" placeholder="confirm password" required />
-                    <button type="submit" class="submit-btn" @click="submitLogin">Submit</button>
-                    <label><input type="checkbox" v-model="rememberChoice" />Remember Me</label>
-                    <a href="#" @click="invertSignIn">{{ informUser }}</a>
-                </form>
-            </div>
-        </div>
+  <div class="login-page">
+    <h1>Nice to see you!</h1>
+    <div class="page-form">
+      <h3>{{signIn ? "Sign in" : "Sign up"}}</h3>
+      <div>
+        <form class="sign-in-form" @submit.prevent="">
+          <input v-model.trim="email.val" type="email" placeholder="email" required />
+          <input v-model.trim="password.val" type="password" placeholder="password" required />
+          <input v-if="!signIn" v-model.trim="confirmedPass.val" type="password" placeholder="confirm password" required />
+					<p v-if="!formIsValid">ERROR! Please make sure you provide {{mustProvide}}</p>
+          <button type="submit" class="submit-btn" @click="submitLogin">Submit</button>
+          <label><input type="checkbox" v-model="rememberChoice" />Remember Me</label>
+          <a href="#" @click="invertSignIn">{{ informUser }}</a>
+        </form>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 export default {
-    data(){
-        return {
-            signIn: true,
-            // username: "",
-            login_email: "",
-            login_password: "",
-            reg_confirmpassword: "",
-            rememberChoice: true,
-        }
-    },
-    
-    // use this if you want to give the username to anyone
-    // could possibly be done with emits instead if you don't want this to be App.vue
-    // provide() {
-    //     return {
-    //         name: this.username,
-    //     }
-    // },
+  data(){
+    return {
+      signIn: true,
+      // username: "",
+      email: {
+				val: "",
+				isValid: false,
+			},
+      password: {
+				val: "",
+				isValid: false,
+			},
+      confirmedPass: {
+				val: "",
+				isValid: false,
+			},
 
-    computed: {
-        informUser(){
-            if (this.signIn)
-                return "Don't have an account? Click here to sign up!";
-            
-            return "Already have an account?";
-        },
-    },
-
-    methods: {
-        invertSignIn(){
-            this.signIn = !this.signIn;
-        }
+      rememberChoice: true,
+			formIsValid: true,
     }
+  },
+  
+  // use this if you want to give the username to anyone
+  // could possibly be done with emits instead if you don't want this to be App.vue
+	// probably better to store this with vuex
+  // provide() {
+  //   return {
+  //     name: this.username,
+  //   }
+  // },
+
+  computed: {
+    informUser(){
+      if (this.signIn)
+        return "Don't have an account? Click here to sign up!";
+      
+      return "Already have an account?";
+    },
+		mustProvide(){
+			if (!this.email.isValid) {
+				return "a valid email address!";
+			}
+			if (!this.password.isValid)
+				return "a valid password longer than 7 characters!";
+			if (!this.signIn && !this.confirmedPass.isValid) {
+				return "matching passwords!";
+			}
+			return "all details!";
+		}
+		
+  },
+
+  methods: {
+    invertSignIn(){
+      this.signIn = !this.signIn;
+    },
+
+		validateForm(){
+			//this.formIsValid = this.email.val.includes('@.') && (!this.signIn ? this.confirmedPass.val > 7 : this.password.val > 7);
+			this.formIsValid = true;
+
+			this.email.isValid = this.email.val.includes('@') && this.email.val.includes('.');
+			this.password.isValid = this.password.val.length > 7;
+			this.confirmedPass.isValid = this.confirmedPass.val === this.password.val;
+
+			this.formIsValid = this.email.isValid && this.password.isValid && (!this.signIn ? this.confirmedPass.isValid : true);
+		},
+		
+		submitLogin(){
+			this.validateForm();
+
+		}
+  }
 }
 </script>
 
 <style scoped>
 .login-page {
-    color: black;
+  color: black;
 }
 
 .page-form {
-    margin: 30%;
-    margin-bottom: 10%;
-    margin-top: 20px;
-    border-style: none;
-    border-color: #dce0e6;
-    border-radius: 20px;
-    padding:10px;
-    box-shadow: 0 10px 20px -8px rgba(0, 0, 0,.4);
+  margin: 30%;
+  margin-bottom: 10%;
+  margin-top: 20px;
+  border-style: none;
+  border-color: #dce0e6;
+  border-radius: 20px;
+  padding:10px;
+  box-shadow: 0 10px 20px -8px rgba(0, 0, 0,.4);
 }
 
 .sign-in-form {
-    display: grid;
-    padding-top: 20px;
-    padding-left: 10%;
-    padding-right: 10%;
+  display: grid;
+  padding-top: 20px;
+  padding-left: 10%;
+  padding-right: 10%;
 }
 
 .sign-in-form input, .sign-in-form button {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 button {
@@ -137,12 +178,12 @@ input:focus, input:focus:hover {
 }
 
 input:hover {
-    background: #e8e8e8;
+  background: #e8e8e8;
 }
 
 label input[type="checkbox"] {
-    display: inline;
-    width: 30px;
+  display: inline;
+  width: 30px;
 }
 
 </style>
