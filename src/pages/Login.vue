@@ -12,6 +12,7 @@
           <button type="submit" class="submit-btn" @click="submitLogin">Submit</button>
           <label><input type="checkbox" v-model="rememberChoice" />Remember Me</label>
           <a href="#" @click="invertSignIn">{{ informUser }}</a>
+          <p v-if="$store.getters.getUserEmail">{{ $store.getters.getUserEmail }}</p>
         </form>
       </div>
     </div>
@@ -90,7 +91,7 @@ export default {
 		
 		submitLogin(){
 			this.validateForm();
-
+      this.$store.state.user_email = "nice";
 		}
   }
 }
