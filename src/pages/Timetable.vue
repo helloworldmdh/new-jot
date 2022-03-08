@@ -45,23 +45,23 @@ export default {
     },
 
     checkOverlap(){
-      for (var day in this.timeSlots) {
+  
+      this.timeSlots.forEach((day) => {
+        console.log(day)
         var previousEndTime = 0;
         var previousIndent = 0; 
-        for (var slot in day){
-          console.log(slot.startTime, previousEndTime)
+        day.forEach((slot) => {
           if (slot.startTime < previousEndTime){
-            slot = {...slot, indent: previousIndent + 1};
+            slot.indent = previousIndent + 1
             previousIndent++
-            
           }
           else{
-            slot = {...slot, indent: 0};
+            slot.indent = 0;
             previousIndent = 0;
           }
-        }
-      }
-      //console.log(this.timeSlots)
+          previousEndTime = slot.startTime + slot.length
+        });
+      });
     }
     
   },
@@ -88,6 +88,18 @@ export default {
             lecturer: "name123",
             day: 0,
             startTime: 360,
+            endTime: 660,
+            length: 60,
+            location: "",
+            module: "",
+            indent: 1,
+          },
+          {
+            id: "lecture-0-5200",
+            title: "lecture2132",
+            lecturer: "name123",
+            day: 0,
+            startTime: 370,
             endTime: 660,
             length: 60,
             location: "",

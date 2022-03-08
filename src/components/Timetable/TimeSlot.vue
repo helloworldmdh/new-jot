@@ -1,5 +1,5 @@
 <template>
-    <div :class="computedStyle" :style="{'height': computedHeight, 'top': computedTop, 'margin-left': computedLeft}">
+    <div :class="computedStyle" :style="{'height': computedHeight, 'top': computedTop, 'margin-left': computedLeft, 'width': computedWidth}">
         <div>
             <div>
                 {{ lectureTitle }}
@@ -61,8 +61,10 @@ export default {
             return `${this.startTime/20}em`
         },
         computedLeft(){
-            console.log(this.indent, this.lectureTitle)
-            return `${this.indent+1}em`
+            return `${this.indent+1}vw`
+        },
+        computedWidth(){
+            return `${96-(this.indent*8)}%`
         },
         computedStyle(){
             if (this.day == -1) return 'time'
@@ -77,7 +79,7 @@ export default {
 <style scoped>
 
     /*
-    Style for all of the time slots on the timetable
+        Style for all of the time slots on the timetable
     */
     .normal-slot{
         margin-left: 1em;
@@ -92,8 +94,8 @@ export default {
         left:-0.95em;
     }
 
-    /**
-    Style for the time shown on the right side
+    /*
+        Style for the time shown on the right side
      */
     .time{
         margin-left: 1em;
