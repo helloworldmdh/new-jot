@@ -1,6 +1,6 @@
 <template>
 <TheSidebar v-if="page"/>  <!--sidebar component-->
- <div :style="{ marginLeft: computedLeftMargin}">
+ <div :style="{ marginLeft: computedLeftMargin}" class="router_view">
   <router-view></router-view>
  </div>
 </template>
@@ -19,7 +19,7 @@ export default {
   },
   computed:{
     page(){
-      if (this.$route.path === '/login' || this.$route.path === '/')
+      if (this.$route.path === '/login' || this.$route.path === '/aboutus' || this.$route.path === '/')
       {
         return false;
       }
@@ -43,11 +43,13 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--main-font);
   text-align: center;
   color: #50432c;
-  transition: 0.3s;
+}
+
+.router_view{
+  margin-left: 0px;
+  transition: .3s;
 }
 </style>

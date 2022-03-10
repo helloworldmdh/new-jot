@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <h1>Nice to see you!</h1>
+    <h1 class="login-title">Nice to see you!</h1>
     <div class="page-form">
       <h3>{{signIn ? "Sign in" : "Sign up"}}</h3>
       <div>
@@ -8,10 +8,10 @@
           <input v-model.trim="email.val" type="email" placeholder="email" required />
           <input v-model.trim="password.val" type="password" placeholder="password" required />
           <input v-if="!signIn" v-model.trim="confirmedPass.val" type="password" placeholder="confirm password" required />
-					<p v-if="!formIsValid">ERROR! Please make sure you provide {{mustProvide}}</p>
+					<p v-if="!formIsValid">Please make sure you provide {{mustProvide}}</p>
           <button type="submit" class="submit-btn" @click="submitLogin">Submit</button>
           <label><input type="checkbox" v-model="rememberChoice" />Remember Me</label>
-          <a href="#" @click="invertSignIn">{{ informUser }}</a>
+          <a href="#" @click="invertSignIn" class="sign-up">{{ informUser }}</a>
           <p v-if="$store.getters.getUserEmail">{{ $store.getters.getUserEmail }}</p>
         </form>
       </div>
@@ -99,18 +99,23 @@ export default {
 
 <style scoped>
 .login-page {
-  color: black;
+  color: rgb(51, 51, 51);
+}
+
+.login-title{
+  margin-top: 2rem;
+  font-size: 40px;
 }
 
 .page-form {
   margin: 30%;
   margin-bottom: 10%;
-  margin-top: 20px;
+  margin-top: 2rem;
   border-style: none;
   border-color: #dce0e6;
   border-radius: 20px;
   padding:10px;
-  box-shadow: 0 10px 20px -8px rgba(0, 0, 0,.4);
+  box-shadow: 0 5px 8px 0px rgba(82, 82, 82, 0.4);
 }
 
 .sign-in-form {
@@ -126,7 +131,7 @@ export default {
 
 button {
   border-radius: 4px;
-  background-color: #5ca1e1;
+  background-color: #a8a8a8;
   border: none;
   color: #fff;
   text-align: center;
@@ -187,4 +192,13 @@ label input[type="checkbox"] {
   width: 30px;
 }
 
+.sign-up{
+  text-decoration: none;
+  color: rgb(51, 51, 51);
+}
+
+.sign-up:hover{
+  transform: translateY(0.05rem);
+  text-decoration: underline;
+}
 </style>

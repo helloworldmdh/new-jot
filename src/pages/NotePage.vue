@@ -1,22 +1,32 @@
 <template>
   <div>
       <h1> Note Page </h1>
-    </div>
-      <AddModuleMenu></AddModuleMenu>
+      <textarea class="text"> Start typing here... </textarea>
+  </div>
 </template>
 
 <script>
-import AddModuleMenu from "../components/Timetable/AddModuleMenu.vue";
 
 export default {
   name:"NotePage",
 
   components: {
-    AddModuleMenu,
   },
 }
 </script>
 
 <style>
+body{
+  text-align: center;
+}
+
+.text{
+  width: 50vw;
+  height: 90vh;
+  resize: none;
+  border: 0em;
+  padding: 2vh 3vw;
+  
+}
 
 </style>

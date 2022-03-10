@@ -4,6 +4,7 @@ function loadPage (component) {
 }
 export default [
     { path: '/', component: loadPage('Landing') },
+    { path: '/aboutus', component: loadPage('AboutUs') },
     { path: '/timetable', component: loadPage('Timetable') },
     { path: '/login', component: loadPage('Login')},
     { path: '/settings', component: loadPage('Settings')},

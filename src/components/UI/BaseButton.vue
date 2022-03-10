@@ -13,7 +13,7 @@ export default {
 <style scoped>
 .button {
   display: block;
-  width: 40%;
+  width: 20em;
   height: 60px;
   max-width: 100%;
   margin: 0 auto;

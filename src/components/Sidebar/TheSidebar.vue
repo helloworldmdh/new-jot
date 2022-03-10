@@ -12,7 +12,7 @@
       <SidebarLink id="icon-style" to="/timer"> <box-icon name='time-five' size='lg' color='white' /></SidebarLink>
       <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='lg' color='white' /></SidebarLink>
 
-      <SidebarLink id="bottom-icon" to="/settings"><box-icon name='cog' size='lg' color='white' /></SidebarLink>
+      <SidebarLink id="icon-style" to="/settings"><box-icon name='cog' size='lg' color='white' /></SidebarLink>
       <SidebarLink id="bottom-icon" to="/"><box-icon name='log-out-circle' size='lg' color='white' /></SidebarLink>
      </span>
    </h1>
@@ -62,6 +62,7 @@ export default {
   color: whitesmoke;
   margin-bottom: 1em;
   margin-top: 1.3em;
+  transition: .5s;
 }
 
 .arrow {
@@ -81,9 +82,9 @@ export default {
 }
 
 #bottom-icon {
-  position: relative;
-  bottom: 2%;
-  top: 15%;
+  position: absolute;
+  bottom: 0.5em;
+  left: 0em;
   padding: 0em;
   margin-bottom: 1rem;
 }
