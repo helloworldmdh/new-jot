@@ -1,10 +1,13 @@
 <template>
-  <div class="login-page">
-    <h1 class="login-title">Nice to see you!</h1>
+  <div class="login-body">
+    <div class="header">
+      <router-link to="/aboutus" class="link">About the App</router-link>
+    </div>
     <div class="page-form">
-      <h3>{{signIn ? "Sign in" : "Sign up"}}</h3>
+      <span class="login-title">{{ signIn ? "Sign in" : "Sign up" }}</span>
       <div>
         <form class="sign-in-form" @submit.prevent="">
+<<<<<<< Updated upstream
           <input v-model.trim="email.val" type="email" placeholder="email" required />
           <input v-model.trim="password.val" type="password" placeholder="password" required />
           <input v-if="!signIn" v-model.trim="confirmedPass.val" type="password" placeholder="confirm password" required />
@@ -13,6 +16,39 @@
           <button type="submit" class="submit-btn" @click="submitDetails">Submit</button>
           <label><input type="checkbox" v-model="rememberChoice" />Remember Me</label>
           <a href="#" @click="invertSignIn">{{ informUser }}</a>
+=======
+          <input
+            v-model.trim="email.val"
+            type="email"
+            placeholder="email"
+            required
+          />
+          <input
+            v-model.trim="password.val"
+            type="password"
+            placeholder="password"
+            required
+          />
+          <input
+            v-if="!signIn"
+            v-model.trim="confirmedPass.val"
+            type="password"
+            placeholder="confirm password"
+            required
+          />
+          <p v-if="!formIsValid">
+            Please make sure you provide {{ mustProvide }}
+          </p>
+          <button type="submit" class="submit-btn" @click="submitLogin">
+            Submit
+          </button>
+          <label
+            ><input type="checkbox" v-model="rememberChoice" />Remember
+            Me</label
+          >
+          <a href="#" @click="invertSignIn" class="sign-up">{{ informUser }}</a>
+
+>>>>>>> Stashed changes
         </form>
       </div>
     </div>
@@ -21,33 +57,38 @@
 
 <script>
 export default {
-  data(){
+  data() {
     return {
       signIn: true,
       // username: "",
       email: {
-				val: "",
-				isValid: false,
-			},
+        val: "",
+        isValid: false,
+      },
       password: {
-				val: "",
-				isValid: false,
-			},
+        val: "",
+        isValid: false,
+      },
       confirmedPass: {
-				val: "",
-				isValid: false,
-			},
+        val: "",
+        isValid: false,
+      },
 
       rememberChoice: true,
+<<<<<<< Updated upstream
 			formIsValid: true,
 			error: null,
 			userEmail: "",
     }
+=======
+      formIsValid: true,
+    };
+>>>>>>> Stashed changes
   },
-  
+
   // use this if you want to give the username to anyone
   // could possibly be done with emits instead if you don't want this to be App.vue
-	// probably better to store this with vuex
+  // probably better to store this with vuex
   // provide() {
   //   return {
   //     name: this.username,
@@ -55,40 +96,44 @@ export default {
   // },
 
   computed: {
-    informUser(){
-      if (this.signIn)
-        return "Don't have an account? Click here to sign up!";
-      
+    informUser() {
+      if (this.signIn) return "Don't have an account? Click here to sign up!";
+
       return "Already have an account?";
     },
-		mustProvide(){
-			if (!this.email.isValid) {
-				return "a valid email address!";
-			}
-			if (!this.password.isValid)
-				return "a valid password longer than 7 characters!";
-			if (!this.signIn && !this.confirmedPass.isValid) {
-				return "matching passwords!";
-			}
-			return "all details!";
-		}
-		
+    mustProvide() {
+      if (!this.email.isValid) {
+        return "a valid email address!";
+      }
+      if (!this.password.isValid)
+        return "a valid password longer than 7 characters!";
+      if (!this.signIn && !this.confirmedPass.isValid) {
+        return "matching passwords!";
+      }
+      return "all details!";
+    },
   },
 
   methods: {
+<<<<<<< Updated upstream
     invertSignIn(){
 			this.error = null;
+=======
+    invertSignIn() {
+>>>>>>> Stashed changes
       this.signIn = !this.signIn;
     },
 
-		validateForm(){
-			//this.formIsValid = this.email.val.includes('@.') && (!this.signIn ? this.confirmedPass.val > 7 : this.password.val > 7);
-			this.formIsValid = true;
+    validateForm() {
+      //this.formIsValid = this.email.val.includes('@.') && (!this.signIn ? this.confirmedPass.val > 7 : this.password.val > 7);
+      this.formIsValid = true;
 
-			this.email.isValid = this.email.val.includes('@') && this.email.val.includes('.');
-			this.password.isValid = this.password.val.length > 7;
-			this.confirmedPass.isValid = this.confirmedPass.val === this.password.val;
+      this.email.isValid =
+        this.email.val.includes("@") && this.email.val.includes(".");
+      this.password.isValid = this.password.val.length > 7;
+      this.confirmedPass.isValid = this.confirmedPass.val === this.password.val;
 
+<<<<<<< Updated upstream
 			return this.formIsValid = this.email.isValid && this.password.isValid && (!this.signIn ? this.confirmedPass.isValid : true);
 		},
 		
@@ -123,27 +168,67 @@ export default {
 		},
   },
 }
+=======
+      this.formIsValid =
+        this.email.isValid &&
+        this.password.isValid &&
+        (!this.signIn ? this.confirmedPass.isValid : true);
+    },
+
+    submitLogin() {
+      this.validateForm();
+      this.$store.state.user_email = "";
+    },
+  },
+};
+>>>>>>> Stashed changes
 </script>
 
 <style scoped>
-.login-page {
-  color: rgb(51, 51, 51);
+.login-body {
+  background: url(../assets/img/landing.jpg) no-repeat;
+  height: 100vh;
+  background-size: auto auto;
+  color: #14142c;
 }
 
-.login-title{
-  margin-top: 2rem;
+.header {
+  height: 5rem;
+  width: 100%;
+  background-color: var(--accent-one);
+  box-shadow: 0px 2px 10px rgb(151, 151, 151);
+}
+
+.link {
+  color: white;
+  position: fixed;
+  font-size: 24px;
+  top: 1.25rem;
+  right: 2.5rem;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.login-title {
   font-size: 40px;
 }
 
 .page-form {
-  margin: 30%;
-  margin-bottom: 10%;
-  margin-top: 2rem;
-  border-style: none;
-  border-color: #dce0e6;
-  border-radius: 20px;
-  padding:10px;
-  box-shadow: 0 5px 8px 0px rgba(82, 82, 82, 0.4);
+    justify-content: center;
+    padding: 1rem;
+    top: 6vh;
+    position: relative;
+    display: block;
+    border-radius: 1em;
+    box-shadow: 0px 5px 10px #6867a1;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: aliceblue;
 }
 
 .sign-in-form {
@@ -153,13 +238,14 @@ export default {
   padding-right: 10%;
 }
 
-.sign-in-form input, .sign-in-form button {
+.sign-in-form input,
+.sign-in-form button {
   margin-bottom: 20px;
 }
 
 button {
   border-radius: 4px;
-  background-color: #a8a8a8;
+  background-color: var(--main-color);
   border: none;
   color: #fff;
   text-align: center;
@@ -167,10 +253,7 @@ button {
   padding: 2%;
   transition: all 0.5s;
   cursor: pointer;
-  box-shadow: 0 5px 10px -8px rgba(0, 0, 0,.7);
-}
-
-button{
+  box-shadow: 0 5px 10px -8px rgba(0, 0, 0, 0.7);
   cursor: pointer;
   display: inline-block;
   position: relative;
@@ -178,17 +261,17 @@ button{
 }
 
 button:after {
-  content: '»';
+  content: "»";
   position: absolute;
-  opacity: 0;  
+  opacity: 0;
   top: 6%;
   right: -20px;
   transition: 0.5s;
 }
 
-button:hover{
+button:hover {
   padding-right: 24px;
-  padding-left:8px;
+  padding-left: 8px;
 }
 
 button:hover:after {
@@ -198,7 +281,7 @@ button:hover:after {
 
 input {
   outline: 0;
-  background: #f2f2f2;
+  background: #ffffff;
   width: 100%;
   border: 0;
   border-radius: 5px;
@@ -207,7 +290,8 @@ input {
   box-sizing: border-box;
 }
 
-input:focus, input:focus:hover {
+input:focus,
+input:focus:hover {
   background: #dbdbdb;
 }
 
@@ -220,12 +304,12 @@ label input[type="checkbox"] {
   width: 30px;
 }
 
-.sign-up{
+.sign-up {
   text-decoration: none;
   color: rgb(51, 51, 51);
 }
 
-.sign-up:hover{
+.sign-up:hover {
   transform: translateY(0.05rem);
   text-decoration: underline;
 }
