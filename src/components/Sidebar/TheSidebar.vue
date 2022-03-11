@@ -13,7 +13,7 @@
       <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='lg' color='white' /></SidebarLink>
 
       <SidebarLink id="icon-style" to="/settings"><box-icon name='cog' size='lg' color='white' /></SidebarLink>
-      <SidebarLink id="bottom-icon" to="/"><box-icon name='log-out-circle' size='lg' color='white' /></SidebarLink>
+      <SidebarLink id="bottom-icon" to="/" @click="$store.dispatch('logout')" v-if="$store.getters.userSignedIn"><box-icon name='log-out-circle' size='lg' color='white' /></SidebarLink>
      </span>
    </h1>
  </div>
