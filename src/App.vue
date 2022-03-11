@@ -14,6 +14,28 @@ export default {
   components: {
     TheSidebar 
   },
+  created(){
+    const email = localStorage.getItem('userEmail');
+    const pass = localStorage.getItem('password');
+    const tokenExpiration = localStorage.getItem('tokenExpiration');
+
+    const expiresIn = +tokenExpiration - new Date().getTime();
+
+    if (expiresIn < 10000) {
+      return;
+    }
+
+    this.$store.state.authTimer = setTimeout(() => {
+      this.$store.dispatch('logout');
+    }, expiresIn)
+
+    if (email && pass) {
+      this.$store.dispatch('submitLogin', {email: email, password: pass});
+    }
+
+    this.$router.replace('/timetable');
+  },
+
   setup() {
     return { sidebarWidth }
   },

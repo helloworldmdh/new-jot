@@ -4,7 +4,8 @@ import {createRouter, createWebHistory } from 'vue-router';
 import routes from './router/routes';
 
 import {createStore} from 'vuex';
-import mainstore from './stores/mainstore/index.js';
+import mainstore from './stores/main/mainstore.js';
+import './api/firebase';
 
 import BaseButton from './components/UI/BaseButton.vue';
 import BaseCard from './components/UI/BaseCard.vue';

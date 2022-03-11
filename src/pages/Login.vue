@@ -8,11 +8,11 @@
           <input v-model.trim="email.val" type="email" placeholder="email" required />
           <input v-model.trim="password.val" type="password" placeholder="password" required />
           <input v-if="!signIn" v-model.trim="confirmedPass.val" type="password" placeholder="confirm password" required />
-					<p v-if="!formIsValid">Please make sure you provide {{mustProvide}}</p>
-          <button type="submit" class="submit-btn" @click="submitLogin">Submit</button>
+					<p v-if="!formIsValid">ERROR! Please make sure you provide {{mustProvide}}</p>
+					<p v-if="error">Error: {{error}}</p>
+          <button type="submit" class="submit-btn" @click="submitDetails">Submit</button>
           <label><input type="checkbox" v-model="rememberChoice" />Remember Me</label>
-          <a href="#" @click="invertSignIn" class="sign-up">{{ informUser }}</a>
-          <p v-if="$store.getters.getUserEmail">{{ $store.getters.getUserEmail }}</p>
+          <a href="#" @click="invertSignIn">{{ informUser }}</a>
         </form>
       </div>
     </div>
@@ -40,6 +40,8 @@ export default {
 
       rememberChoice: true,
 			formIsValid: true,
+			error: null,
+			userEmail: "",
     }
   },
   
@@ -75,6 +77,7 @@ export default {
 
   methods: {
     invertSignIn(){
+			this.error = null;
       this.signIn = !this.signIn;
     },
 
@@ -86,14 +89,39 @@ export default {
 			this.password.isValid = this.password.val.length > 7;
 			this.confirmedPass.isValid = this.confirmedPass.val === this.password.val;
 
-			this.formIsValid = this.email.isValid && this.password.isValid && (!this.signIn ? this.confirmedPass.isValid : true);
+			return this.formIsValid = this.email.isValid && this.password.isValid && (!this.signIn ? this.confirmedPass.isValid : true);
 		},
 		
-		submitLogin(){
-			this.validateForm();
-      this.$store.state.user_email = "nice";
-		}
-  }
+		// better to put this in an actions.js
+		async submitDetails(){
+			if (!this.validateForm()) return;      
+
+      const response = await this.$store.dispatch(this.signIn ? 'submitLogin' : 'submitRegister', {email: this.email.val, password: this.password.val});
+      if (response.message){
+        alert(response.message);
+        return;
+      }
+
+      if (this.rememberChoice){
+        const expiresIn = +this.$store.getters.userExpiresIn * 1000;
+        // const expiresIn = 5000;
+        const expirationDate = new Date().getTime() + expiresIn;
+        localStorage.setItem('tokenExpiration', expirationDate);
+        localStorage.setItem('userEmail', this.$store.getters.userEmail);
+        localStorage.setItem('password', this.password.val);
+        
+        this.$store.state.authTimer = setTimeout(() => {
+          this.$store.dispatch('logout');
+          localStorage.removeItem('userEmail');
+          localStorage.removeItem('password');
+          localStorage.removeItem('tokenExpiration');
+          this.$router.replace('/Login');
+        }, expiresIn)
+      }
+
+			if (this.$store.getters.userSignedIn) this.$router.replace('/settings');
+		},
+  },
 }
 </script>
 
