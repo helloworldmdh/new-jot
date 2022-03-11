@@ -42,7 +42,7 @@ export default {
 <style scoped>
 .sidebar {
   color:#838383;
-  background-color: #d4d4d4;
+  background-color: var(--main-color);
 
   float: left;
   position:fixed;
@@ -60,6 +60,7 @@ export default {
 
 .title{
   color: whitesmoke;
+  font-size: var(--h1-font-size);
   margin-bottom: 1em;
   margin-top: 1.3em;
   transition: .5s;

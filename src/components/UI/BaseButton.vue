@@ -27,7 +27,13 @@ export default {
   font-weight: normal;
   box-shadow: 0 9px 18px rgba(0,0,0,0.2);
   border-radius:8px;
-  color: black;
+  background-color: var(--main-color);
+  color: white;
   font-weight:600;
+}
+
+.button:hover{
+    transform: scale(1.05);
+    transition: .3s;
 }
 </style>

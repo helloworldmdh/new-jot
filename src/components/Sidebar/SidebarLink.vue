@@ -24,6 +24,5 @@ export default {
     display: flex;
     margin-left: 35%;
     position: relative;
-    background-color: #d4d4d4;
 }
 </style>
