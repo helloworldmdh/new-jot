@@ -16,9 +16,10 @@
       </div>
 
       <div class="about_description bottom">
-        <div class= "bottom">Join now to ease your life as a student!</div>
+        <div class="bottom">Join now to ease your life as a student!</div>
         <base-button to="/login" class="login_button"
-          ><div id="login-text">Sign Up</div></base-button>
+          ><div id="login-text">Sign Up</div></base-button
+        >
       </div>
     </div>
   </div>
@@ -68,12 +69,21 @@ export default {
 </script>
 
 <style>
+.main {
+  background: url(../assets/img/landing.jpg) no-repeat;
+  height: 100vh;
+  background-size: auto auto;
+  color: #14142c;
+}
 
 .about_body {
-  padding: 0 3rem;
+  padding: 3rem 3rem;
+  background-color: white;
 }
 
 .header {
+  background-color: var(--accent-one);
+  color: white;
   padding-top: 1.5rem;
   height: 5rem;
   width: 100%;
@@ -105,11 +115,11 @@ export default {
   text-align: center;
   font-size: 24px;
   border-radius: 0.5rem;
-  box-shadow: 3px 3px 3px #aaaaaa;
+  box-shadow: 1px 0px 5px 1px #aaaaaa;
 }
 
-.bottom{
-   margin-bottom: 2rem;
+.bottom {
+  margin-bottom: 2rem;
 }
 
 #login-text {
@@ -118,13 +128,13 @@ export default {
 
 .login_button {
   display: block;
+  background-color: var(--main-color);
   width: 15%;
 }
 
 .about_title:hover {
-  color: #9b9b9b;
-  cursor: pointer;
-  transform: translateY(2px);
+  color: var(--accent-one);
+  cursor: default;
 }
 
 .about_subtitle {
