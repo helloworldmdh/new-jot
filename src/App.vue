@@ -33,7 +33,7 @@ export default {
       this.$store.dispatch('submitLogin', {email: email, password: pass});
     }
 
-    this.$router.replace('/timetable');
+    this.$router.replace('/');
   },
 
   setup() {

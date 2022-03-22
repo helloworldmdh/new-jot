@@ -1,45 +1,107 @@
 <template>
   <div>
     <div class="header">Timer</div>
-    <div class="clock"> 
-        <!--to add : a progress bar-->
-        <div v-show="timerOn" class="progress">
-            <div class="progress-bar" role="progressbar" :style="{'width': widthProgress}" aria-valuenow="currProgress" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <div class="time">
-            <h1 v-if="(timerOn == true) && (studyOrRest == false)">Time to Study</h1>
-            <h1 v-else-if="(timerOn == true) && (studyOrRest == true)">Time to Rest</h1>
-            <h1 v-if="completed">Well Done</h1>
-            <p id="minutes" >{{ minutes }}</p>
-            <p>:</p>
-            <p id="seconds">{{ seconds }}</p>
-        </div>
+    <div class="total_time">
+      Total time studied in the last 30 days {{ totalTime }}
+    </div>
+    <div class="clock">
+      <!--to add : a progress bar-->
+      <div v-show="timerOn" class="progress">
+        <div
+          class="progress-bar"
+          role="progressbar"
+          :style="{ width: widthProgress }"
+          aria-valuenow="currProgress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        ></div>
+      </div>
+      <div class="time">
+        <h1 v-if="timerOn == true && studyOrRest == false">Time to Study</h1>
+        <h1 v-else-if="timerOn == true && studyOrRest == true">Time to Rest</h1>
+        <h1 v-if="completed">Well Done</h1>
+        <p id="minutes">{{ minutes }}</p>
+        <p>:</p>
+        <p id="seconds">{{ seconds }}</p>
+      </div>
 
-        <div class="input" v-if="!timerOn">
-            <div class="desc">Study Time</div>
-            <input type="range" min="5" max="60" v-model="selectStudy" step="5" class="slider" id="studyTime">
-            <div class="currSelect">{{ selectStudy }} minutes</div>
-            <div class="desc">Rest Time</div>
-            <input type="range" min="1" max="15" v-model="selectRest" step="1" class="slider" id="restTime">
-            <div class="currSelect">{{ selectRest }} minutes</div>
-            <div class="desc">Number of Sessions</div>
-            <input type="range" min="1" max="10" v-model="sessions" step="1" class="slider" id="numSessions">
-            <div class="currSelect">{{ sessions }}</div>
-        </div>
+      <div class="input" v-if="!timerOn">
+        <div class="desc">Study Time</div>
+        <input
+          type="range"
+          min="5"
+          max="60"
+          v-model="selectStudy"
+          step="5"
+          class="slider"
+          id="studyTime"
+        />
+        <div class="currSelect">{{ selectStudy }} minutes</div>
+        <div class="desc">Rest Time</div>
+        <input
+          type="range"
+          min="1"
+          max="15"
+          v-model="selectRest"
+          step="1"
+          class="slider"
+          id="restTime"
+        />
+        <div class="currSelect">{{ selectRest }} minutes</div>
+        <div class="desc">Number of Sessions</div>
+        <input
+          type="range"
+          min="1"
+          max="10"
+          v-model="sessions"
+          step="1"
+          class="slider"
+          id="numSessions"
+        />
+        <div class="currSelect">{{ sessions }}</div>
+      </div>
 
-        <button type="submit" v-if="!timerOn" @click="startTimer">Start</button>
-        <div class="timerInProgress" v-if="timerOn">
-            <div v-if="!timerPaused">
-                <button type="submit" :style="{'margin-right': buttonMargin}" @click="pauseTimer">Pause</button></div>
-            <div v-else>
-                <button  type="submit" :style="{'margin-right': buttonMargin}" @click="resumeTimer">Resume</button></div>
-            <button  type="submit" :style="{'margin-right': buttonMargin}" @click="cancelTimer">Cancel</button>
+      <button type="submit" v-if="!timerOn" @click="startTimer">Start</button>
+      <div class="timerInProgress" v-if="timerOn">
+        <div v-if="!timerPaused">
+          <button
+            type="submit"
+            :style="{ 'margin-right': buttonMargin }"
+            @click="pauseTimer"
+          >
+            Pause
+          </button>
         </div>
+        <div v-else>
+          <button
+            type="submit"
+            :style="{ 'margin-right': buttonMargin }"
+            @click="resumeTimer"
+          >
+            Resume
+          </button>
+        </div>
+        <button
+          type="submit"
+          :style="{ 'margin-right': buttonMargin }"
+          @click="cancelTimer"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import app from "../api/firebase";
+import {
+  getFunctions,
+  httpsCallable,
+  connectFunctionsEmulator,
+} from "firebase/functions";
+import { getAuth } from "firebase/auth";
+
 export default {
   name: "Timer",
   data() {
@@ -50,6 +112,7 @@ export default {
       completed: false,
       minutes: "00",
       totalseconds: "00",
+      totalminutes: "00",
       currSeconds: "00",
       seconds: "00",
       selectStudy: 40,
@@ -57,6 +120,7 @@ export default {
       sessions: 3,
       interval: setInterval(0),
       currProgress: 0,
+      totalTime: 0,
     };
   },
   computed: {
@@ -68,6 +132,9 @@ export default {
       let p = this.currProgress + "%";
       return p;
     },
+  },
+  created(){
+    this.getTotalTime();
   },
   methods: {
     runTimer() {
@@ -90,8 +157,10 @@ export default {
           this.sessions--;
           if (this.sessions == 0) {
             this.completed = true;
+            this.saveNewTime();
             this.cancelTimer();
           } else {
+            this.saveNewTime();
             this.startBreak();
           }
         } else if (this.studyOrRest == true) {
@@ -104,6 +173,7 @@ export default {
     },
     startTimer() {
       this.minutes = this.selectStudy;
+      this.totalminutes = this.minutes;
       this.totalseconds = this.minutes * 60;
       this.currSeconds = 0;
       this.completed = false;
@@ -125,7 +195,10 @@ export default {
     cancelTimer() {
       console.log(this.minutes);
       clearInterval(this.interval);
-      this.studyOrRest = false;
+      (this.currSeconds = "00"),
+        (this.totalseconds = "00"),
+        (this.totalminutes = "00"),
+        (this.studyOrRest = false);
       this.timerOn = false;
       this.minutes = "00";
       this.seconds = "00";
@@ -136,6 +209,39 @@ export default {
       this.totalseconds = this.minutes * 60;
       this.currSeconds = 0;
       this.runTimer;
+    },
+    getTotalTime() {
+      const functions = getFunctions(app);
+      if (window.location.hostname === "localhost")
+        connectFunctionsEmulator(functions, "localhost", 5001);
+      const getTotalTime = httpsCallable(functions, "gettotaltime");
+
+      getTotalTime().then((result) => {
+        console.log(result);
+        if (result.data === "No data in database") {
+          this.totalTime = 0;
+        } else {
+          console.log(result.data);
+          this.totalTime += result.data;
+        }
+      });
+    },
+    saveNewTime() {
+      const functions = getFunctions(app);
+      const auth = getAuth(app);
+      if (window.location.hostname === "localhost")
+        // Check if working locally
+        connectFunctionsEmulator(functions, "localhost", 5001);
+      const saveNewTime = httpsCallable(functions, "savenewtime");
+      // eslint-disable-next-line no-unused-vars
+      let uid = auth.currentUser.uid;
+      
+      saveNewTime({
+        time: this.totalminutes,
+        uid: this.uid,
+      }).then((result) => {
+        console.log(result);
+      });
     },
   },
 };
