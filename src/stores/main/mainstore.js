@@ -6,13 +6,7 @@ import mutations from './mutations.js';
 export default {
   state(){
     return {
-      currUser_email: null,
-      currUser_id: null,
-      currUser_expiresIn: Number,
-      currUser_token: null,
       isSignedIn: false,
-      errorMessage: null,
-      authTimer: null,
     };
 },
 

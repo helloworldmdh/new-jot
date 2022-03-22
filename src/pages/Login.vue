@@ -20,6 +20,9 @@
 </template>
 
 <script>
+import {getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, browserLocalPersistence, setPersistence, browserSessionPersistence} from 'firebase/auth';
+import app from '../api/firebase.js';
+
 export default {
   data(){
     return {
@@ -91,36 +94,57 @@ export default {
 
 			return this.formIsValid = this.email.isValid && this.password.isValid && (!this.signIn ? this.confirmedPass.isValid : true);
 		},
-		
-		// better to put this in an actions.js
-		async submitDetails(){
-			if (!this.validateForm()) return;      
 
-      const response = await this.$store.dispatch(this.signIn ? 'submitLogin' : 'submitRegister', {email: this.email.val, password: this.password.val});
-      if (response.message){
-        alert(response.message);
-        return;
+    submitDetails(){
+      if (!this.validateForm) return;
+      if (this.signIn) this.login();
+      else this.signup();
+    },
+
+    login(){
+      const auth = getAuth(app);
+      if (this.rememberChoice) {
+        setPersistence(auth, browserLocalPersistence).then(() => {
+          return signInWithEmailAndPassword(auth, this.email.val, this.password.val).then(() =>{
+            this.$router.replace('/timetable');
+          });
+        })
+        .catch((error) => {
+          alert(error.message);
+        })
+
+      } else {
+        setPersistence(auth, browserSessionPersistence).then(()=> {
+          return signInWithEmailAndPassword(auth, this.email.val, this.password.val);
+        })
+         //.then((userCredential) => {
+        //   // var user = userCredential.user;
+        //   // document.cookie = "accessToken=" + user.accessToken;
+        //   // console.log("Cookie Jar Access Token : ", getCookie("accessToken"));
+        //   // localStorage.setItem('access token', user.accessToken);
+        // }).catch((error) => {
+        //   alert(error.message);
+        // })
       }
 
-      if (this.rememberChoice){
-        const expiresIn = +this.$store.getters.userExpiresIn * 1000;
-        // const expiresIn = 5000;
-        const expirationDate = new Date().getTime() + expiresIn;
-        localStorage.setItem('tokenExpiration', expirationDate);
-        localStorage.setItem('userEmail', this.$store.getters.userEmail);
-        localStorage.setItem('password', this.password.val);
-        
-        this.$store.state.authTimer = setTimeout(() => {
-          this.$store.dispatch('logout');
-          localStorage.removeItem('userEmail');
-          localStorage.removeItem('password');
-          localStorage.removeItem('tokenExpiration');
-          this.$router.replace('/Login');
-        }, expiresIn)
-      }
+      
+    },
 
-			if (this.$store.getters.userSignedIn) this.$router.replace('/settings');
-		},
+    signup(){
+      const auth = getAuth(app);
+      createUserWithEmailAndPassword(auth, this.email.val, this.password.val);
+      //.then((userCredential) => {
+        // const user = userCredential.user;
+        // document.cookie = "accessToken="+user.accessToken;
+        // console.log("Cookie Jar Access Token: ", getCookie("accessToken"));
+        // localStorage.setItem('access token', user.accessToken);
+      // })
+      // .catch((error) => {
+      //   alert(error.message);
+      // });
+
+      
+    }
   },
 }
 </script>

@@ -8,36 +8,19 @@
 <script>
 import TheSidebar from './components/Sidebar/TheSidebar.vue';
 import { sidebarWidth } from './components/Sidebar/sidebar-state.js';
+// import app from './api/firebase.js';
+// import { getAuth } from 'firebase/auth';
 
 export default {
   name: 'App',
   components: {
     TheSidebar 
   },
-  created(){
-    const email = localStorage.getItem('userEmail');
-    const pass = localStorage.getItem('password');
-    const tokenExpiration = localStorage.getItem('tokenExpiration');
-
-    const expiresIn = +tokenExpiration - new Date().getTime();
-
-    if (expiresIn < 10000) {
-      return;
-    }
-
-    this.$store.state.authTimer = setTimeout(() => {
-      this.$store.dispatch('logout');
-    }, expiresIn)
-
-    if (email && pass) {
-      this.$store.dispatch('submitLogin', {email: email, password: pass});
-    }
-
-    this.$router.replace('/timetable');
-  },
-
   setup() {
     return { sidebarWidth }
+  },
+  beforeMount(){
+    this.$store.dispatch('logUser');
   },
   computed:{
     page(){

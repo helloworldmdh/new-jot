@@ -1,56 +1,17 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth } from 'firebase/auth';
+import app from '../../api/firebase.js';
 
 export default {
-  async submitRegister(context, details){
-    if (context.getters.userSignedIn) return;
-
-    const auth = getAuth();
-    return createUserWithEmailAndPassword(auth, details.email, details.password)
-      .then((userCredential) => { 
-        const tokenResponse = userCredential._tokenResponse;
-        context.dispatch('loginOperations', tokenResponse);
-        return userCredential;
-      })
-      .catch((error) => {
-        context.commit('setErrorMessage', error.message);
-        return error;
-      });
-    },
-
-  async submitLogin(context, details){
-    const auth = getAuth();
-    return signInWithEmailAndPassword(auth, details.email, details.password)
-      .then((userCredential) => {
-        const tokenResponse = userCredential._tokenResponse;
-        context.dispatch('loginOperations', tokenResponse);
-        return userCredential;
-      })
-      .catch((error) => {
-        context.commit('setErrorMessage', error.message);
-        return error;
-    });
+  logUser(context){
+    const auth = getAuth(app);
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User logged in already or has just logged in.
+        context.commit('setLoggedIn', true);
+      } else {
+        // User not logged in or has just logged out.
+        context.commit('setLoggedIn', false);
+      }
+    })
   },
-
-  loginOperations(context, tokenResponse){
-    context.commit('setEmail', tokenResponse.email);
-    context.commit('setId', tokenResponse.localId);
-    context.commit('setTokenId', tokenResponse.idToken);
-    context.commit('setSignedIn', true);
-    context.commit('setExpiresIn', tokenResponse.expiresIn);
-    context.commit('setErrorMessage', null);
-  },
-
-  logout(context){
-    context.commit('setEmail', null);
-    context.commit('setId', null);
-    context.commit('setTokenId', null);
-    context.commit('setSignedIn', false);
-    context.commit('setExpiresIn', 0);
-    context.commit('setErrorMessage', null);
-
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('password');
-
-    clearTimeout(context.state.authTimer);
-  },
-};
+}

@@ -7,30 +7,35 @@ admin.initializeApp();
 // https://firebase.google.com/docs/functions/write-firebase-functions
 
 
-// exports.posttime = functions.https.onCall((data, context) => {
-//     const uid = context.auth.uid;
-//     if(!uid)
-//         throw new functions.https.HttpsError('no-userid', 'The requested user wasnot found');
-//     else
-//         return admin.firestore().collection('comments').add({ 
-//             timeslot: data.body.data.timeslot, 
-//             uid: data.body.data.uid }).then(()=> {
-//             data.send({"data": "Saved in Database"});
-//         });
+exports.setTimeslot = functions.https.onCall((request, context) => {
+    const uid = context.auth.uid;
+    if(!uid)
+        throw new functions.https.HttpsError('no-userid', 'The requested user wasnot found');
+    else
+        return admin.firestore().collection('users').doc(uid).set({ 
+            timeslot: request.body.data.timeslot, }).then(()=> {
+            request.send({"data": "Saved in TimeSlot in Database"});
+        });
+});
 
-// });
+exports.setModule = functions.https.onCall((request, context) => {
+  const uid = context.auth.uid;
+  if(!uid)
+      throw new functions.https.HttpsError('no-userid', 'The requested user wasnot found');
+  else
+      return admin.firestore().collection('users').doc(uid).set({ 
+          modules: request.body.data.module, }).then(()=> {
+          request.send({"data": "Saved in modules in Database"});
+      });
+});
 
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
 
 exports.authSignUp = functions.auth.user().onCreate((user) => {
   return admin.firestore().collection('users').doc(user.uid).set({
     // default values when the user signs up
-    email: user.email,
     alias: user.email, 
-    comments: [],
+    timeSlots: [],
+    modules: [],
     timeStudied: 0,
   })
 });

@@ -1,4 +1,5 @@
 <template>
+  <base-card></base-card>
   <div class="timetable">
     <div class="time-column">
         <time-slot v-for="i in 24" :key="i"
@@ -44,6 +45,8 @@ export default {
 
     },
 
+    
+
     checkOverlap(){
   
       this.timeSlots.forEach((day) => {
@@ -67,7 +70,6 @@ export default {
   },
   data() {
     return {
-      timeArray: [],
       timeSlots:[
         [
           {

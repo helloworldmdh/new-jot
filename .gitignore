@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
 /dist
+/function/node_modules
 /src/api
-/functions
 firebase.json
 
 
