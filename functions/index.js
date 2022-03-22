@@ -1,7 +1,7 @@
-// const functions = require("firebase-functions");
-// const admin = require('firebase-admin');
-// //const cors = require('cors')({origin: true});
-// admin.initializeApp();
+const functions = require("firebase-functions");
+const admin = require('firebase-admin');
+require('cors')({origin: true});
+admin.initializeApp();
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -24,3 +24,17 @@
 //   functions.logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
+
+exports.authSignUp = functions.auth.user().onCreate((user) => {
+  return admin.firestore().collection('users').doc(user.uid).set({
+    // default values when the user signs up
+    email: user.email,
+    alias: user.email, 
+    comments: [],
+    timeStudied: 0,
+  })
+});
+
+exports.authDelete = functions.auth.user().onDelete((user) => {
+  return admin.firestore().collection('users').doc(user.uid).delete();
+});
