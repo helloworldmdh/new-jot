@@ -9,8 +9,8 @@
           {{ module }}
         </li>
       </ul> -->
-      <div class="user">Total Time Studied: {{ timeStudied }}</div>
-      <button class="btn">Change Password</button>
+      <div class="user">Total Time Studied: {{ timeStudied }} minutes</div>
+      <button class="password_btn">Change Password</button>
     </div>
     <div class="option"></div>
     <div class="option"></div>
@@ -18,15 +18,15 @@
 </template>
 
 <script>
-// import app from "../api/firebase";
-// import {
-//   getFunctions,
-//   httpsCallable,
-//   connectFunctionsEmulator,
-// } from "firebase/functions";
-// import { getAuth } from "firebase/auth";
+import app from "../api/firebase";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { getAuth } from "firebase/auth";
 
 export default {
+  mounted(){
+    const auth = getAuth(app);
+    this.email = auth.currentUser.email;
+  },
   name: 'Settings',
   data() {
     return {
@@ -35,12 +35,22 @@ export default {
       timeStudied: 0,
     };
   },
+  created(){
+    this.getTotalTime();
+  },
   methods: {
-    // fillDetails(){
-    //   const functions = getFunctions(app);
-    //   if (window.location.hostname === "localhost")
-    //   const getTotalTime = httpsCallable(functions, "gettotaltime");
-    // }
+    getTotalTime() {
+       const functions = getFunctions(app);
+       const getTotalTime = httpsCallable(functions, "gettotaltime");
+
+      getTotalTime().then((result) => {
+         if (result.data === "No data in database") {
+           return;
+         } else {
+           this.timeStudied = result.data.data;
+         }
+       });
+     },
   }
 };
 </script>
@@ -63,7 +73,7 @@ export default {
   margin: 0rem 0rem 0.5rem;
 }
 
-.btn {
+.password_btn {
   display: block;
   justify-content: right;
   margin: 0.5em;

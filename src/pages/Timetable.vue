@@ -1,7 +1,5 @@
 <template>
-  <base-dialog :show="showDialogBox" title="nice" @close="closeBox">
-    nice
-  </base-dialog>
+  <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTable"></add-module-menu>
   <a class="floating-btn" @click="openBox">+</a>
   <div class="timetable">
     <div class="time-column">
@@ -16,8 +14,8 @@
     </div>
     <div :class="dayStyle(day)" v-for="day in 7" :key="day">
         <time-slot v-for="slot in timeSlots[day-1]" :key="slot.id"
-          :lecturer="slot.lecturer"
-          :lectureTitle="slot.lectureTitle"
+          :lecturer="slot.mod"
+          :lectureTitle="slot.title"
           :length="slot.length"
           :startTime="slot.startTime"
           :day="day-1"
@@ -29,16 +27,22 @@
 </template>
 
 <script>
+import app from "../api/firebase"
 import TimeSlot from "../components/Timetable/TimeSlot.vue";
+import AddModuleMenu from "../components/Timetable/AddModuleMenu.vue";
+import { getFunctions, httpsCallable } from "firebase/functions";
+
 
 export default {
+
   name: 'Timetable',
 
   components: {
     TimeSlot,
-  },
+    AddModuleMenu
+},
   created(){
-    this.checkOverlap()
+    this.updateTable();
   },
   methods: {
     dayStyle(day) {
@@ -48,12 +52,33 @@ export default {
 
     },
 
+    updateTable(){
+      this.getTimeSlots().then(() => {
+        this.splitByDay();
+        this.checkOverlap();
+      });
+      this.showDialogBox = false
+    },
+
+    splitByDay() {
+      this.timeSlots = [[],[],[],[],[],[],[],]
+      this.baseTimeSlots.forEach((timeSlot) => {
+        this.timeSlots[timeSlot.day].push(timeSlot)
+      })
+    },
+
+    async getTimeSlots(){
+      const functions = getFunctions(app);
+			const getTimeslots = httpsCallable(functions, 'getTimeslots')
+			await getTimeslots().then((result) => {
+				this.baseTimeSlots = result.data.data;
+			})
+    },
     
 
     checkOverlap(){
   
       this.timeSlots.forEach((day) => {
-        console.log(day)
         var previousEndTime = 0;
         var previousIndent = 0; 
         day.forEach((slot) => {
@@ -72,15 +97,16 @@ export default {
 
     closeBox(){
       this.showDialogBox = false;
+      this.updateTable();
     },
     openBox(){
-      console.log("called!");
       this.showDialogBox = true;
     },
 
   },
   data() {
     return {
+      baseTimeSlots: [],
       timeSlots:[
         [
           {
@@ -213,7 +239,5 @@ export default {
   height: 67em;
   border-width: 2px;
 }
-
-
 
 </style>

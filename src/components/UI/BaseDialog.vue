@@ -12,8 +12,9 @@
       </section>
       <menu>
         <slot name="actions">
-          <button class="btn btn-primary" @click="tryClose">Close</button>
+          
         </slot>
+        <button class="btn btn-primary m-3" @click="tryClose">Close</button>
       </menu>
     </dialog>
   </teleport>
@@ -58,6 +59,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.75);
   z-index: 10;
 }
+
 
 dialog {
   position: fixed;

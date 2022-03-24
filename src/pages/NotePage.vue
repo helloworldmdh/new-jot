@@ -4,14 +4,15 @@
     <div class="notes_container">
       <div class="module_selection">
         <h3 class="title">Modules</h3>
-        <ul class="module_cards" :v-for="module in modules" v-key="index">
-          <li class="note_inst" :v-for="note in notes" v-key="note.date_created">
+        <ul class="module_cards" v-for="m in module_names" :key="m">
+          {{ m }}
+          <li class="note_inst" v-for="note in m" :key="note">
             {{note.title}}
           </li>
         </ul>
       </div>
       <div class="note_taking">
-        <textarea class="text"> Start typing here... </textarea>
+        <textarea class="text" placeholder="Start typing here..."></textarea>
       </div>
     </div>
   </div>
@@ -22,14 +23,14 @@ export default {
   name: "NotePage",
   data() {
     return {
-      modules:[],
+      module_names:[],
       notes: [],
       note:{
         module_name: '',
         text: '',
         title: '',
         date_created: '',
-      }
+      },
     };
   },
 };
@@ -52,7 +53,7 @@ body {
 }
 
 .title{
-  text-align: center;
+  text-align: left;
 }
 
 .text {
@@ -62,5 +63,6 @@ body {
   resize: none;
   border: 0em;
   padding: 2vh 3vw;
+  outline: none;
 }
 </style>

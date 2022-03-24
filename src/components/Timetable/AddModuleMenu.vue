@@ -1,111 +1,176 @@
 <template>
-    <div class="wrapper">
-        <div class="filter" id="priority"><select id="priority-level" required="required">
-                <option value="HIGH">HIGH</option>
-                <option value="MEDIUM">MEDIUM</option>
-                <option value="LOW">LOW</option>
-            </select><label for="priority-level">PRIORITY</label></div>
-        <div class="filter" id="time-left"><input type="text" id="time" required="required" /><label for="time">TIME LEFT</label>
-            <div class="separator"></div><select>
-                <option value="Days">Days</option>
-                <option value="%">%</option>
-            </select>
-        </div>
-        <div class="filter" id="search"><input type="text" id="search-assignee" required="required" /><label for="search-assignee">SEARCH</label><i class="material-icons">search</i></div>
-    </div>
+  <base-dialog title="Create a Timeslot">
+		<div class="dialog_container">
+			<div class="labels">
+				<div class="label_details">Title </div>
+				<div class="label_details">Module </div>
+				<div class="label_details">Time </div>
+				<div class="label_details">Day </div>
+				<div class="label_details">Lecturer </div>
+			</div>
+			<div class="mod_inputs">
+				<input type="text" class="input_box_title" v-model.trim="newTimeSlot.title"/><br>
+				<input type="text" class="input_box_modname" v-model.trim="modName"/> <input type="color" class="input_box_color" v-model="newModule.colour"/><br>
+				<input type="time" class="input_box_time" v-model="startTimeString"/> - <input type="time" class="input_box_time" v-model="endTimeString"/><br>
+				<select class="input_box" v-model="newTimeSlot.day">
+					<option v-for="(d, index) in days" :key="d" :value="index"> {{ d }}</option>
+				</select><br>
+				<input type="text" class="input_box" v-model.trim="newModule.lecturer"/><br>
+			</div>
+		</div>
+		<template #actions>
+			<button class="btn btn-primary m-3" @click="submit">Submit</button>
+			<button class="btn btn-primary m-3" @click="getTimeSlots">get time slots</button>
+		</template>
+  </base-dialog>
 </template>
-<script>
 
+<script>
+import app from "../../api/firebase"
+import { getFunctions, httpsCallable } from "firebase/functions";
+// import { getAuth } from 'firebase/auth';
 export default ({
+	
     name: 'AddModuleMenu',
+	data() {
+		return {
+			timeSlots: [[],[],[],[],[],[],[]],
+			newTimeSlot: {
+				title: "",
+				mod: "",
+				day: null,
+				startTime: null,
+				length: null,
+			},
+			startTimeString: "",
+			endTimeString: "",
+			modName: "",
+			newModule: {
+				name: "",
+				colour: "#33CDFF",
+				lecturer: "",
+			},
+			existingModules: [],
+			days: [
+				"Monday",
+				"Tuesday",
+				"Wednesday",
+				"Thursday",
+				"Friday",
+				"Saturday",
+				"Sunday",
+			],
+		}
+	},
+	emits: ['updateTable'],
+	watch: {
+		startTimeString(string) {
+			const splitTimeString = string.split(':');
+			this.newTimeSlot.startTime = +splitTimeString[0] * 60 + +splitTimeString[1]
+		},
+		endTimeString(string) {
+			const splitTimeString = string.split(':');
+			this.newTimeSlot.length = (+splitTimeString[0] * 60 + +splitTimeString[1]) - this.newTimeSlot.startTime;
+		},
+		modName(name) {
+			this.newModule.name = name;
+			this.newTimeSlot.mod = name;
+		}
+	},
+	methods: {
+		close() {
+			this.$emit('updateTable');
+		},
+		async getTimeSlots() {
+			const functions = getFunctions(app);
+			const getTimeslots = httpsCallable(functions, 'getTimeslots')
+			await getTimeslots().then((result) => {
+				this.timeSlots = result.data.data;
+			})
+		},
+		submit() {
+			this.getTimeSlots().then(() => {
+				console.log("Working")
+				var exists = !!this.existingModules.find(mod => mod.name == this.newModule.name);
+
+				if (!exists) {
+					this.existingModules.push(this.newModule);
+				} 				
+				if (this.timeSlots)
+					this.timeSlots.push(this.newTimeSlot);
+				else
+					this.timeSlots = [this.newTimeSlot]
+
+				console.log(this.timeSlots);
+
+				const functions = getFunctions(app);
+				
+				const setTimeslots = httpsCallable(functions, 'setTimeslots');
+				setTimeslots({newTimeSlots: this.timeSlots}).then((result) => {
+					// Read result of the Cloud Function.
+					// /** @type {any} */
+					console.log(result);
+					this.close();
+				}).catch((error) => {
+					console.log(error);
+				});
+			});
+		}
+	},
 })
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css?family=Josefin+Sans:400,600');
-.filter {
-	margin-right: 20px;
-	width: 317px;
-	height: 69px;
-	border-radius: 4px;
-	background-color: #fff;
-	box-shadow: 0 0 30px 0 rgba(199, 199, 199, 0.25);
+.dialog_container{
+	display: grid;
+	grid-template-columns: 1fr 2fr;
+}
+
+.labels{
+	width: 4em;
+}
+
+.label_details{
+	margin: 0.3em 0 0.85em;
+}
+.mod_inputs{
+	width: 20em;
+}
+
+.input_box{
+	height: 30px;
+	width: 20em;
+	margin-bottom: 0.5em;
+}
+
+.input_box_title{
+	height: 30px;
+	width: 20em;
+	margin-bottom: 0em;
+}
+
+.input_box_modname{
+	height: 30px;
+	width: 16em;
+	margin: 0em 0.5em 0.5em 0;
+}
+
+.input_box_color{
+	height: 30px;
 	position: relative;
-	display: flex;
-	align-items: center;
-	padding: 0 20px;
-	margin-bottom: 20px;
+	width: 3.2em;
+	padding: 0 0 0;
+	margin: 0px 0px 0px;
+	bottom: -5px;
+	top: 8px;
 }
-.filter label {
-	font-size: 18px;
-	font-weight: bold;
-	color: rgba(33, 75, 93, 0.5);
-	position: absolute;
-	transition: 0.4s ease-in-out;
-	margin-top: 2px;
+
+.input_box_time{
+	height: 30px;
+	width: 9.523em;
+	margin-bottom: 0.5em;
 }
-.filter input {
-	width: 200px;
-	margin-top: 20px;
-	order: none;
-	outline: none;
-	font-size: 20px;
-	color: #214b5d;
-	transition: 0.4s linear;
-	border-bottom: 2px solid rgba(0, 0, 0, 0);
-}
-.filter input:focus {
-	border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-}
-.filter input:focus + label {
-	font-size: 14px;
-	margin-top: -15px;
-}
-.filter input:valid + label {
-	font-size: 14px;
-	margin-top: -15px;
-}
-#time-left select {
-	width: 100px;
-	border: none;
-	font-size: 20px;
-	color: #214b5d;
-	outline: none;
-}
-#time-left .separator {
-	width: 3px;
-	height: 45px;
-	background-color: rgba(0, 0, 0, 0.1);
-	margin: 0 20px;
-}
-#priority select {
-	width: 100%;
-	border: none;
-	font-size: 20px;
-	color: #fff;
-	outline: none;
-	margin-left: -4px;
-	padding-top: 20px;
-}
- #priority select:focus {
-	color: #214b5d;
-}
- #priority select:valid {
-	color: #214b5d;
-}
-#priority select:focus + label {
-    font-size: 14px;
-    margin-top: -15px;
-}
-#priority select:valid + label {
-	font-size: 14px;
-	margin-top: -15px;
-}
-#search input {
-	width: 100%;
-}
-#search i {
-	color: #214b5d;
-}
- 
+.btn{
+	height: 54px;
+ }
 </style>

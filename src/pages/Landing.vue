@@ -4,7 +4,7 @@
       <router-link to="/aboutus" class="link">About the App</router-link>
     </div>
     <div class="main">
-      <h1 class="app-name">NewJot</h1>
+      <div class="app_name">NewJot</div>
       <div id="desc">All a student needs in one place</div>
       <base-button :to="$store.getters.isSignedIn ?  '/timetable' : '/login'"><div id="login-text">{{ $store.getters.isSignedIn ? "Go to Timetable" : "Log in"}}</div></base-button>
     </div>
@@ -63,9 +63,10 @@ export default {
   text-decoration: underline;
 }
 
-.app-name {
+.app_name {
+  text-align: center;
   margin-bottom: 4rem;
-  font-size: 64px;
+  font-size: 60px;
 }
 
 #desc {

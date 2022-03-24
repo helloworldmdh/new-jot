@@ -2,7 +2,7 @@
   <div>
     <div class="header">Timer</div>
     <div class="total_time">
-      Total time studied in the last 30 days {{ totalTime }}
+      Total time studied: {{ totalTime }} minutes
     </div>
     <div class="clock">
       <!--to add : a progress bar-->
@@ -94,13 +94,12 @@
 </template>
 
 <script>
-// import app from "../api/firebase";
-// import {
-//   getFunctions,
-//   httpsCallable,
-//   connectFunctionsEmulator,
-// } from "firebase/functions";
-// import { getAuth } from "firebase/auth";
+import app from "../api/firebase";
+import {
+  getFunctions,
+  httpsCallable
+  } from "firebase/functions";
+import { getAuth } from "firebase/auth";
 
 export default {
   name: 'Timer',
@@ -133,9 +132,9 @@ export default {
       return p;
     },
   },
-  // created(){
-  //   this.getTotalTime();
-  // },
+  created(){
+    this.getTotalTime();
+  },
   methods: {
     runTimer() {
       this.currProgress = (this.currSeconds / this.totalseconds) * 100;
@@ -156,10 +155,12 @@ export default {
           this.studyOrRest = true;
           this.sessions--;
           if (this.sessions == 0) {
+            this.totalTime = +this.totalTime + +this.totalminutes;
             this.completed = true;
             this.saveNewTime();
             this.cancelTimer();
           } else {
+            this.totalTime = +this.totalTime + +this.totalminutes;
             this.saveNewTime();
             this.startBreak();
           }
@@ -180,7 +181,7 @@ export default {
       this.timerOn = true;
       this.interval = setInterval(() => {
         this.runTimer();
-      }, 1000);
+      }, 10);
     },
     pauseTimer() {
       this.timerPaused = true;
@@ -210,39 +211,36 @@ export default {
       this.currSeconds = 0;
       this.runTimer;
     },
-    // getTotalTime() {
-    //   const functions = getFunctions(app);
-    //   if (window.location.hostname === "localhost")
-    //     connectFunctionsEmulator(functions, "localhost", 5001);
-    //   const getTotalTime = httpsCallable(functions, "gettotaltime");
+    getTotalTime() {
+       const functions = getFunctions(app);
+       const getTotalTime = httpsCallable(functions, "gettotaltime");
 
-    //   getTotalTime().then((result) => {
-    //     console.log(result);
-    //     if (result.data === "No data in database") {
-    //       this.totalTime = 0;
-    //     } else {
-    //       console.log(result.data);
-    //       this.totalTime += result.data;
-    //     }
-    //   });
-    // },
-    //  saveNewTime() {
-    //   const functions = getFunctions(app);
-    //   const auth = getAuth(app);
-    //   if (window.location.hostname === "localhost")
-    //     // Check if working locally
-    //     connectFunctionsEmulator(functions, "localhost", 5001);
-    //   const saveNewTime = httpsCallable(functions, "saveNewTime");
-    //   // eslint-disable-next-line no-unused-vars
-    //   let uid = auth.currentUser.uid;
-      
-    //   saveNewTime({
-    //     time: this.totalminutes,
-    //     uid: this.uid,
-    //   }).then((result) => {
-    //     console.log(result);
-    //   });
-    // },
+      getTotalTime().then((result) => {
+         console.log(result);
+         if (result.data === "No data in database") {
+           return;
+         } else {
+           console.log(result.data);
+           this.totalTime = result.data.data;
+         }
+       });
+     },
+     saveNewTime() {
+      const functions = getFunctions(app);
+      const auth = getAuth(app);
+      const saveNewTime = httpsCallable(functions, "saveNewTime");
+      // eslint-disable-next-line no-unused-vars
+      const uid = auth.currentUser.uid;
+      //const timeStudied = this.getTotalTime();
+      if (!uid) return;
+
+      saveNewTime({
+        timeStudied: this.totalTime,
+        uid: uid,
+      }).then((result) => {
+        console.log(result);
+      });
+    },
   },
 };
 </script>
