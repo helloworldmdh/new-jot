@@ -4,11 +4,7 @@
       <router-link to="/aboutus" class="link">About the App</router-link>
     </div>
     <div class="page-form">
-<<<<<<< HEAD
       <h1 class="login-title">{{ signIn ? "Sign in" : "Sign up" }}</h1>
-=======
-      <h3 class="login-title">{{ signIn ? "Sign in" : "Sign up" }}</h3>
->>>>>>> f98dc3967f340ec697228b8f9975e305aa7459e7
       <div>
         <form class="sign-in-form" @submit.prevent="">
           <input
