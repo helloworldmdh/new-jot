@@ -1,5 +1,8 @@
 <template>
-  <base-card></base-card>
+  <base-dialog :show="showDialogBox" title="nice" @close="closeBox">
+    nice
+  </base-dialog>
+  <a class="floating-btn" @click="openBox">+</a>
   <div class="timetable">
     <div class="time-column">
         <time-slot v-for="i in 24" :key="i"
@@ -65,8 +68,16 @@ export default {
           previousEndTime = slot.startTime + slot.length
         });
       });
-    }
-    
+    },
+
+    closeBox(){
+      this.showDialogBox = false;
+    },
+    openBox(){
+      console.log("called!");
+      this.showDialogBox = true;
+    },
+
   },
   data() {
     return {
@@ -136,6 +147,7 @@ export default {
           },
         ]
       ],
+      showDialogBox: false,
     }
   }
 }
@@ -144,8 +156,29 @@ export default {
 
 
 <style scoped>
+.floating-btn{
+  width: 80px;
+  height: 80px;
+  background: #5ac0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 40px;
+  box-shadow:2px 2px 5px rgba(0, 0, 0, 0.25);
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  transition: background 0.25s;
+  z-index: 9;
+  cursor: pointer;
+}
 
-
+.floating-btn:active {
+  background: #4593b8;
+}
 
 
 .day{

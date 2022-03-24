@@ -5,10 +5,12 @@ import routes from './router/routes';
 
 import {createStore} from 'vuex';
 import mainstore from './stores/main/mainstore.js';
-import './api/firebase';
+import fb_app from './api/firebase';
+import { getAuth } from 'firebase/auth';
 
 import BaseButton from './components/UI/BaseButton.vue';
 import BaseCard from './components/UI/BaseCard.vue';
+import BaseDialog from './components/UI/BaseDialog.vue';
 //import '@fortawesome/fontawesome-free/js/all'
 
 const store = createStore(mainstore);
@@ -47,13 +49,16 @@ const router = createRouter({
 router.beforeEach(function(to, _, next){
     // console.log(to.meta.requiresNoAuth);
     // console.log(store.getters.isSignedIn);
-    if (to.meta.requiresAuth && !store.getters.isSignedIn) {
-        next('/login');
-    } else if (to.meta.requiresNoAuth && store.getters.isSignedIn) {
-        next('/');
-    } else {
-        next();
-    }
+    const auth = getAuth(fb_app);
+    auth.onAuthStateChanged(user => {
+        if (to.meta.requiresAuth && !user) {
+            next('/login');
+        } else if (to.meta.requiresNoAuth && user) {
+            next('/');
+        } else {
+            next();
+        }
+    })    
 });
 
 const app = createApp(App);
@@ -61,6 +66,7 @@ const app = createApp(App);
 // whole app router-aware.
 app.component('base-button', BaseButton);
 app.component('base-card', BaseCard);
+app.component('base-dialog', BaseDialog)
 app.use(router);
 app.use(store);
 app.mount('#app');
