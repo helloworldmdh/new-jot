@@ -24,7 +24,7 @@ export default {
   },
   computed:{
     page(){
-      if (this.$route.path === '/login' || this.$route.path === '/aboutus' || this.$route.path === '/')
+      if (this.$route.path === '/login' || this.$route.path === '/aboutus' || this.$route.path === '/notfound' || this.$route.path === '/')
       {
         return false;
       }

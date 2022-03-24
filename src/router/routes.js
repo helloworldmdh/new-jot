@@ -10,5 +10,7 @@ export default [
     { path: '/settings', component: loadPage('Settings'), meta: { requiresAuth: true } },
     { path: '/notes', component: loadPage('NotePage'), meta: { requiresAuth: true } },
     { path: '/timer', component: loadPage('Timer'), meta: { requiresAuth: true } },
+    { path: '/notfound', component: loadPage('NotFound') },
+    { path: '/:notFound(.*)', redirect: '/notfound'} // catchAll route
     //copy and paste above with other page details to establish further routes
 ]
