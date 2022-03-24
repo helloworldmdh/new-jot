@@ -3,9 +3,8 @@
     <div class="header">
       <router-link to="/aboutus" class="link">About the App</router-link>
     </div>
-    <h1 class="login-title">Nice to see you!</h1>
     <div class="page-form">
-      <h3>{{ signIn ? "Sign in" : "Sign up" }}</h3>
+      <h3 class="login-title">{{ signIn ? "Sign in" : "Sign up" }}</h3>
       <div>
         <form class="sign-in-form" @submit.prevent="">
           <input
@@ -157,16 +156,13 @@ export default {
 
     signup(){
       const auth = getAuth(app);
-      createUserWithEmailAndPassword(auth, this.email.val, this.password.val);
-      //.then((userCredential) => {
-        // const user = userCredential.user;
-        // document.cookie = "accessToken="+user.accessToken;
-        // console.log("Cookie Jar Access Token: ", getCookie("accessToken"));
-        // localStorage.setItem('access token', user.accessToken);
-      // })
-      // .catch((error) => {
-      //   alert(error.message);
-      // });
+      createUserWithEmailAndPassword(auth, this.email.val, this.password.val)
+      .then(() => {
+        this.$router.replace('/timetable');
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
 
       
     }
@@ -215,6 +211,7 @@ export default {
   border-radius: 1em;
   box-shadow: 0px 5px 10px #6867a1;
   width: 40%;
+  margin-top: 4vh;
   margin-left: auto;
   margin-right: auto;
   background-color: aliceblue;

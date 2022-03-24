@@ -6,7 +6,7 @@
     <div class="main">
       <h1 class="app-name">NewJot</h1>
       <div id="desc">All a student needs in one place</div>
-      <base-button to="/login"><div id="login-text">Log In</div></base-button>
+      <base-button :to="$store.getters.isSignedIn ?  '/timetable' : '/login'"><div id="login-text">{{ $store.getters.isSignedIn ? "Go to Timetable" : "Log in"}}</div></base-button>
     </div>
   </div>
 </template>
@@ -37,6 +37,7 @@ export default {
   border-radius: 1em;
   box-shadow: 0px 5px 10px #6867a1;
   width: 40%;
+  margin-top: 4vh;
   margin-left: auto;
   margin-right: auto;
   background-color: aliceblue;

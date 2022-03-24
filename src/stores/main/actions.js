@@ -4,6 +4,7 @@ import app from '../../api/firebase.js';
 export default {
   logUser(context){
     const auth = getAuth(app);
+
     auth.onAuthStateChanged((user) => {
       if (user) {
         // User logged in already or has just logged in.
