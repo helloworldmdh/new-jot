@@ -10,7 +10,7 @@ admin.initializeApp();
 exports.setTimeslot = functions.https.onCall((request, context) => {
     const uid = context.auth.uid;
     if(!uid)
-        throw new functions.https.HttpsError('no-userid', 'The requested user wasnot found');
+        throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
     else
         return admin.firestore().collection('users').doc(uid).set({ 
             timeslot: request.body.data.timeslot, }).then(()=> {
@@ -21,13 +21,25 @@ exports.setTimeslot = functions.https.onCall((request, context) => {
 exports.setModule = functions.https.onCall((request, context) => {
   const uid = context.auth.uid;
   if(!uid)
-      throw new functions.https.HttpsError('no-userid', 'The requested user wasnot found');
+      throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
       return admin.firestore().collection('users').doc(uid).set({ 
           modules: request.body.data.module, }).then(()=> {
           request.send({"data": "Saved in modules in Database"});
       });
 });
+
+// exports.saveNewTime = functions.https.onCall((request, context) => {
+//   const uid = context.auth.uid;
+//   if(!uid)
+//       throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+//   else
+//       return admin.firestore().collection('users').doc(uid).set({ 
+//           timestudied: request.body.data.timestudied, }).then(()=> {
+//           request.send({"data": "Saved in modules in Database"});
+//       });
+// });
+
 
 
 exports.authSignUp = functions.auth.user().onCreate((user) => {

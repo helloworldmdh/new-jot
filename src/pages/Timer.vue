@@ -94,16 +94,16 @@
 </template>
 
 <script>
-import app from "../api/firebase";
-import {
-  getFunctions,
-  httpsCallable,
-  connectFunctionsEmulator,
-} from "firebase/functions";
-import { getAuth } from "firebase/auth";
+// import app from "../api/firebase";
+// import {
+//   getFunctions,
+//   httpsCallable,
+//   connectFunctionsEmulator,
+// } from "firebase/functions";
+// import { getAuth } from "firebase/auth";
 
 export default {
-  name: "Timer",
+  name: 'Timer',
   data() {
     return {
       studyOrRest: false, //false == study, true == rest
@@ -133,9 +133,9 @@ export default {
       return p;
     },
   },
-  created(){
-    this.getTotalTime();
-  },
+  // created(){
+  //   this.getTotalTime();
+  // },
   methods: {
     runTimer() {
       this.currProgress = (this.currSeconds / this.totalseconds) * 100;
@@ -210,39 +210,39 @@ export default {
       this.currSeconds = 0;
       this.runTimer;
     },
-    getTotalTime() {
-      const functions = getFunctions(app);
-      if (window.location.hostname === "localhost")
-        connectFunctionsEmulator(functions, "localhost", 5001);
-      const getTotalTime = httpsCallable(functions, "gettotaltime");
+    // getTotalTime() {
+    //   const functions = getFunctions(app);
+    //   if (window.location.hostname === "localhost")
+    //     connectFunctionsEmulator(functions, "localhost", 5001);
+    //   const getTotalTime = httpsCallable(functions, "gettotaltime");
 
-      getTotalTime().then((result) => {
-        console.log(result);
-        if (result.data === "No data in database") {
-          this.totalTime = 0;
-        } else {
-          console.log(result.data);
-          this.totalTime += result.data;
-        }
-      });
-    },
-    saveNewTime() {
-      const functions = getFunctions(app);
-      const auth = getAuth(app);
-      if (window.location.hostname === "localhost")
-        // Check if working locally
-        connectFunctionsEmulator(functions, "localhost", 5001);
-      const saveNewTime = httpsCallable(functions, "savenewtime");
-      // eslint-disable-next-line no-unused-vars
-      let uid = auth.currentUser.uid;
+    //   getTotalTime().then((result) => {
+    //     console.log(result);
+    //     if (result.data === "No data in database") {
+    //       this.totalTime = 0;
+    //     } else {
+    //       console.log(result.data);
+    //       this.totalTime += result.data;
+    //     }
+    //   });
+    // },
+    //  saveNewTime() {
+    //   const functions = getFunctions(app);
+    //   const auth = getAuth(app);
+    //   if (window.location.hostname === "localhost")
+    //     // Check if working locally
+    //     connectFunctionsEmulator(functions, "localhost", 5001);
+    //   const saveNewTime = httpsCallable(functions, "saveNewTime");
+    //   // eslint-disable-next-line no-unused-vars
+    //   let uid = auth.currentUser.uid;
       
-      saveNewTime({
-        time: this.totalminutes,
-        uid: this.uid,
-      }).then((result) => {
-        console.log(result);
-      });
-    },
+    //   saveNewTime({
+    //     time: this.totalminutes,
+    //     uid: this.uid,
+    //   }).then((result) => {
+    //     console.log(result);
+    //   });
+    // },
   },
 };
 </script>
@@ -255,7 +255,6 @@ export default {
   font-size: 56px;
   font-weight: 300;
   text-align: center;
-  margin-top: 2rem;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");

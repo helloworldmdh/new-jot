@@ -6,14 +6,14 @@
 
      <h1>
      <span v-if="!sidebarCollapsed">
-      <h1 class="title">NewJot<br></h1>   <!--title when sidebar expands-->
+      <h1 class="title" :style="{ width: sidebarWidth }">NewJot<br></h1>   <!--title when sidebar expands-->
+      <div class="divider" :style="{ width: sidebarWidth }"></div>
+      <SidebarLink id="icon-style" to="/timetable"><box-icon name='calendar' size='lg' color='white' /><span class="link_name">Timetable</span></SidebarLink>
+      <SidebarLink id="icon-style" to="/timer"> <box-icon name='time-five' size='lg' color='white' /><span class="link_name">Timer</span></SidebarLink>
+      <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='lg' color='white' /><span class="link_name">Notes</span></SidebarLink>
+      <SidebarLink id="icon-style" to="/settings"><box-icon name='cog' size='lg' color='white' /><span class="link_name">Settings</span></SidebarLink>
 
-      <SidebarLink id="icon-style" to="/timetable"><box-icon name='calendar' size='lg' color='white' /></SidebarLink>
-      <SidebarLink id="icon-style" to="/timer"> <box-icon name='time-five' size='lg' color='white' /></SidebarLink>
-      <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='lg' color='white' /></SidebarLink>
-
-      <SidebarLink id="icon-style" to="/settings"><box-icon name='cog' size='lg' color='white' /></SidebarLink>
-      <SidebarLink id="bottom-icon" to="/" @click="logout"><box-icon name='log-out-circle' size='lg' color='white' /></SidebarLink>
+      <SidebarLink id="bottom-icon" to="/" @click="logout"><box-icon name='log-out-circle' size='lg' color='white' /><span class="link_name_logout">Logout</span></SidebarLink>
      </span>
    </h1>
  </div>
@@ -68,9 +68,20 @@ export default {
 .title{
   color: whitesmoke;
   font-size: var(--h1-font-size);
-  margin-bottom: 1em;
-  margin-top: 1.3em;
+  width: auto;
+  text-align: center;
+  margin-left: -7px;
+  margin-bottom: .75em;
+  margin-top: 1.5em;
   transition: .5s;
+}
+
+.divider{
+  margin-left: -7px;
+  height: .01rem;
+  background-color: azure;
+  width: 0px;
+  margin-bottom: .5em;
 }
 
 .arrow {
@@ -84,16 +95,41 @@ export default {
   transition: 0.3s linear;
 }
 
+.link_name{
+  display: block;
+  font-size: var(--normal-font-size);
+  text-align: center;
+  margin-bottom: .7em;
+  transition: .5s;
+  color: white;
+}
+
+.link_name_logout{
+  display: block;
+  font-size: var(--normal-font-size);
+  text-align: center;
+  margin-bottom: .25em;
+  transition: .5s;
+  color: white;
+}
+
+.link_name:hover, .link_name_logout:hover{
+    text-shadow: 2px 2px #7e7caf;
+}
+
 #icon-style{
-  margin-bottom: 1.5em;
+  margin-bottom: 1.2em;
   text-decoration: none;
 }
 
 #bottom-icon {
-  position: absolute;
-  bottom: 0.5em;
-  left: 0em;
+  display: block;
+  position: fixed;
+  bottom: 0em;
+  left: 2.8rem;
   padding: 0em;
   margin-bottom: 1rem;
+  text-align: center;
+  text-decoration: none;
 }
 </style>

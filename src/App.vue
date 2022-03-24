@@ -57,4 +57,8 @@ export default {
   margin-left: 0px;
   transition: .3s;
 }
+
+[v-cloak] {
+  display: none;
+}
 </style>

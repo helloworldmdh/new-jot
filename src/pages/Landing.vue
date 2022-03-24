@@ -6,7 +6,7 @@
     <div class="main">
       <h1 class="app-name">NewJot</h1>
       <div id="desc">All a student needs in one place</div>
-      <base-button to="/login"><div id="login-text">Log In</div></base-button>
+      <base-button :to="$store.getters.isSignedIn ?  '/timetable' : '/login'"><div id="login-text">{{ $store.getters.isSignedIn ? "Go to Timetable" : "Log in"}}</div></base-button>
     </div>
   </div>
 </template>
@@ -18,7 +18,6 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 .landing_body {
   background: url(../assets/img/landing.jpg) no-repeat;
@@ -37,6 +36,7 @@ export default {
   border-radius: 1em;
   box-shadow: 0px 5px 10px #6867a1;
   width: 40%;
+  margin-top: 4vh;
   margin-left: auto;
   margin-right: auto;
   background-color: aliceblue;

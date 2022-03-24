@@ -21,8 +21,8 @@ export default {
 
 <style scoped>
 .link{
-    display: flex;
-    margin-left: 35%;
+    display: block;
     position: relative;
 }
+
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main_about">
     <div class="header">
       <h1 class="about_main-title">About the App</h1>
     </div>
@@ -17,8 +17,7 @@
 
       <div class="about_description bottom">
         <div class="bottom">Join now to ease your life as a student!</div>
-        <base-button to="/login" class="login_button"
-          ><div id="login-text">Sign Up</div></base-button
+        <base-button :to="$store.getters.isSignedIn ?  '/timetable' : '/login'" class="login_button"><div id="login-text">{{ $store.getters.isSignedIn ? "Go to Timetable" : "Sign Up"}}</div></base-button
         >
       </div>
     </div>
@@ -69,7 +68,8 @@ export default {
 </script>
 
 <style>
-.main {
+
+.main_about {
   background: url(../assets/img/landing.jpg) no-repeat;
   height: 100vh;
   background-size: auto auto;
@@ -116,6 +116,7 @@ export default {
   font-size: 24px;
   border-radius: 0.5rem;
   box-shadow: 1px 0px 5px 1px #aaaaaa;
+  cursor: default;
 }
 
 .bottom {
@@ -130,11 +131,6 @@ export default {
   display: block;
   background-color: var(--main-color);
   width: 15%;
-}
-
-.about_title:hover {
-  color: var(--accent-one);
-  cursor: default;
 }
 
 .about_subtitle {

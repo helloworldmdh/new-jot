@@ -6,7 +6,7 @@
   <div class="timetable">
     <div class="time-column">
         <time-slot v-for="i in 24" :key="i"
-        :lectureTitle="i-1+':00 - '+(i)+':00'"
+        :lectureTitle="i-1+':00'"
         :length="60"
         :startTime="(i-1)*60"
         :day="-1"
