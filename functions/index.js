@@ -94,3 +94,30 @@ exports.authSignUp = functions.auth.user().onCreate((user) => {
 exports.authDelete = functions.auth.user().onDelete((user) => {
   return admin.firestore().collection('users').doc(user.uid).delete();
 });
+
+exports.postNote = functions.https.onCall((data, context) => {
+  const uid = context.auth.uid;
+  if (!uid) {
+    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+  } else {
+    return admin.firestore().collection('users').doc(uid).update({
+      notes: admin.firestore.FieldValue.arrayUnion(data),
+    })
+  }
+});
+
+exports.getNotes = functions.https.onCall((_, context) => {
+  const uid = context.auth.uid;
+  if (!uid)
+    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+  else
+    return admin.firestore().collection('users').doc(uid).get().then(doc => {
+      if (!doc.exists) {
+        console.log('No matching documents.');
+        return ({ data: 'No data in database' });
+      }
+      // console.log(snapshot)
+      // 2. Send data back to client
+      return ({ data: doc.data().notes});
+    });
+});
