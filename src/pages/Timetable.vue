@@ -1,6 +1,13 @@
 <template>
-  <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTable"></add-module-menu>
+  <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTableAndClose"></add-module-menu>
   <a class="floating-btn" @click="openBox">+</a>
+  <view-module-menu :show="slotSelect" @close="unselect" 
+    :title="selected.title"
+    :mod_name="selected.mod"
+    :sTime="selected.startTime"
+    :day="selected.day"
+    :time_length="selected.length"
+  />
   <div class="timetable">
     <div class="time-column">
         <time-slot v-for="i in 24" :key="i"
@@ -20,6 +27,8 @@
           :startTime="slot.startTime"
           :day="day-1"
           :indent="slot.indent"
+          :colour="slot.colour"
+          @click="selectSlot(slot)"
         >
         </time-slot>
     </div>
@@ -31,6 +40,7 @@ import app from "../api/firebase"
 import TimeSlot from "../components/Timetable/TimeSlot.vue";
 import AddModuleMenu from "../components/Timetable/AddModuleMenu.vue";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import ViewModuleMenu from '../components/Timetable/ViewModuleMenu.vue';
 
 
 export default {
@@ -39,30 +49,45 @@ export default {
 
   components: {
     TimeSlot,
-    AddModuleMenu
-},
+    AddModuleMenu,
+    ViewModuleMenu,
+  },
   created(){
     this.updateTable();
+    const d = new Date();
+    if (d.getDay() == 0) this.currentDay = 7;
+    else this.currentDay = d.getDay()
   },
   methods: {
     dayStyle(day) {
-      if (day == 1)
+      if (day == this.currentDay)
         return 'day-today'
       return 'day'
-
     },
 
-    updateTable(){
-      this.getTimeSlots().then(() => {
-        this.splitByDay();
-        this.checkOverlap();
-      });
-      this.showDialogBox = false
+    updateTableAndClose() {
+      this.updateTable()
+      this.closeBox()
+    },
+
+    async updateTable(){
+      await this.getTimeSlots()
+      await this.getModules()
+      this.addColour();
+      this.splitByDay();
+      this.checkOverlap();
+    },
+
+    addColour() {
+      this.colourTimeSlots = this.baseTimeSlots;
+      this.baseTimeSlots.forEach((slot, index)=> {
+          this.colourTimeSlots[index].colour = this.existingModules.find(element => element.name == slot.mod).colour
+      })
     },
 
     splitByDay() {
       this.timeSlots = [[],[],[],[],[],[],[],]
-      this.baseTimeSlots.forEach((timeSlot) => {
+      this.colourTimeSlots.forEach((timeSlot) => {
         this.timeSlots[timeSlot.day].push(timeSlot)
       })
     },
@@ -71,14 +96,23 @@ export default {
       const functions = getFunctions(app);
 			const getTimeslots = httpsCallable(functions, 'getTimeslots')
 			await getTimeslots().then((result) => {
-				this.baseTimeSlots = result.data.data;
+        if (!result.data.data) {
+          this.openBox()
+          this.baseTimeSlots = []
+        } else {
+          this.baseTimeSlots = result.data.data;
+        }
 			})
     },
     
 
     checkOverlap(){
-  
       this.timeSlots.forEach((day) => {
+        day.sort((a,b) => {
+          if (a.startTime == b.startTime)
+            return b.length - a.length
+          return a.startTime - b.startTime;
+        })
         var previousEndTime = 0;
         var previousIndent = 0; 
         day.forEach((slot) => {
@@ -99,79 +133,128 @@ export default {
       this.showDialogBox = false;
       this.updateTable();
     },
+
     openBox(){
       this.showDialogBox = true;
     },
 
+    async getModules() {
+			const functions = getFunctions(app);
+			const getModules = httpsCallable(functions, 'getModules')
+			await getModules().then((result) => {
+				this.existingModules = result.data.data;
+			})
+		},
+    selectSlot(slot){
+      this.selected = slot;
+      console.log(this.selected);
+      this.slotSelect = true;
+    },
+    unselect(){
+      this.slotSelect = false;
+    },
   },
   data() {
     return {
+      selected:{
+        title: "",
+        day: 0,
+        startTime: 0,
+        length: 0,
+        location: "",
+        module: "",
+        lecturer: "",
+      },
+      slotSelect: false,
       baseTimeSlots: [],
+      colourTimeSlots: [],
+      existingModules: [],
+      currentDay: 0,
       timeSlots:[
         [
           {
-            id: "lecture-0-540",
-            title: "lecture1",
-            lecturer: "name2",
+            title: "Loading Modules...",
             day: 0,
-            startTime: 340,
-            endTime: 660,
-            length: 60,
+            startTime: 0,
+            length: 1440,
             location: "",
             module: "",
+            colour: "rgba(128, 128, 128, 0.1)",
             indent: 0,
           },
-          {
-            id: "lecture-0-5400",
-            title: "lecture2132",
-            lecturer: "name123",
-            day: 0,
-            startTime: 360,
-            endTime: 660,
-            length: 60,
-            location: "",
-            module: "",
-            indent: 1,
-          },
-          {
-            id: "lecture-0-5200",
-            title: "lecture2132",
-            lecturer: "name123",
-            day: 0,
-            startTime: 370,
-            endTime: 660,
-            length: 60,
-            location: "",
-            module: "",
-            indent: 1,
-          },
-          {
-            id: "lecture-0-540",
-            title: "lecture2",
-            lecturer: "name1",
-            day: 0,
-            startTime: 540,
-            endTime: 660,
-            length: 120,
-            location: "",
-            module: "",
-            indent: 0,
-          }
         ],
         [
           {
-            id: "lecture2-0-600",
-            title: "lecture2",
-            lecturer: "name2",
+            title: "Loading Modules...",
             day: 1,
-            startTime: 800,
-            endTime: 660,
-            length: 30,
+            startTime: 0,
+            length: 1440,
             location: "",
             module: "",
+            colour: "rgba(128, 128, 128, 0.1)",
             indent: 0,
           },
-        ]
+        ],
+        [
+          {
+            title: "Loading Modules...",
+            day: 2,
+            startTime: 0,
+            length: 1440,
+            location: "",
+            module: "",
+            colour: "rgba(128, 128, 128, 0.1)",
+            indent: 0,
+          },
+        ],
+        [
+          {
+            title: "Loading Modules...",
+            day: 3,
+            startTime: 0,
+            length: 1440,
+            location: "",
+            module: "",
+            colour: "rgba(128, 128, 128, 0.1)",
+            indent: 0,
+          },
+        ],
+        [
+          {
+            title: "Loading Modules...",
+            day: 4,
+            startTime: 0,
+            length: 1440,
+            location: "",
+            module: "",
+            colour: "rgba(128, 128, 128, 0.1)",
+            indent: 0,
+          },
+        ],
+        [
+          {
+            title: "Loading Modules...",
+            day: 5,
+            startTime: 0,
+            length: 1440,
+            location: "",
+            module: "",
+            colour: "rgba(128, 128, 128, 0.1)",
+            indent: 0,
+          },
+        ],
+        [
+          {
+            title: "Loading Modules...",
+            day: 6,
+            startTime: 0,
+            length: 1440,
+            location: "",
+            module: "",
+            colour: "rgba(128, 128, 128, 0.1)",
+            indent: 0,
+          },
+        ],
       ],
       showDialogBox: false,
     }

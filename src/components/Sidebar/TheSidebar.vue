@@ -5,15 +5,19 @@
   </span>
 
      <h1>
-     <span v-if="!sidebarCollapsed">
-      <h1 class="title" :style="{ width: sidebarWidth }">NewJot<br></h1>   <!--title when sidebar expands-->
+     <span v-show="!sidebarCollapsed">
+     <transition name="fade"> <h1 class="title" v-if="!sidebarCollapsed">NewJot<br></h1> </transition>   <!--title when sidebar expands-->
       <div class="divider" :style="{ width: sidebarWidth }"></div>
+      <transition name="fade_icon">
+      <div v-if = "!sidebarCollapsed">
       <SidebarLink id="icon-style" to="/timetable"><box-icon name='calendar' size='lg' color='white' /><span class="link_name">Timetable</span></SidebarLink>
       <SidebarLink id="icon-style" to="/timer"> <box-icon name='time-five' size='lg' color='white' /><span class="link_name">Timer</span></SidebarLink>
       <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='lg' color='white' /><span class="link_name">Notes</span></SidebarLink>
       <SidebarLink id="icon-style" to="/settings"><box-icon name='cog' size='lg' color='white' /><span class="link_name">Settings</span></SidebarLink>
 
       <SidebarLink id="bottom-icon" to="/" @click="logout"><box-icon name='log-out-circle' size='lg' color='white' /><span class="link_name_logout">Logout</span></SidebarLink>
+      </div>
+     </transition>
      </span>
    </h1>
  </div>
@@ -59,7 +63,7 @@ export default {
   bottom: 0;
   padding: 0.5em;
 
-  transition: 0.4s ease; /* speed of toggle */
+  transition: 0.5s ease; /* speed of toggle */
 
   display: flex;
   flex-direction: column;
@@ -68,12 +72,31 @@ export default {
 .title{
   color: whitesmoke;
   font-size: var(--h1-font-size);
-  width: auto;
+  width: 0px;
   text-align: center;
   margin-left: -7px;
   margin-bottom: .75em;
   margin-top: 1.5em;
-  transition: .5s;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade_icon-enter-active,
+.fade_icon-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade_icon-enter-from,
+.fade_icon-leave-to {
+  opacity: 0;
 }
 
 .divider{

@@ -74,8 +74,7 @@ export default {
 }
 
 .password_btn {
-  display: block;
-  justify-content: right;
+  right: 0.5rem;
   margin: 0.5em;
   border-width: 2px;
   border-color: #6867a1;

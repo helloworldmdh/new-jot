@@ -1,5 +1,5 @@
 <template>
-    <div :class="computedStyle" :style="{'height': computedHeight, 'top': computedTop, 'margin-left': computedLeft, 'width': computedWidth}">
+    <div :class="computedStyle" :style="{'height': computedHeight, 'background-color': this.colour, 'top': computedTop, 'margin-left': computedLeft, 'width': computedWidth, 'color': computedFont}">
         <div>
             <div>
                 {{ lectureTitle }}
@@ -26,6 +26,10 @@ export default {
         'location':{
             type: String,
             required: false,
+        },
+        'colour': {
+            type: String,
+            default: "#A0E7E5"
         },
         'length':{
             type: Number,
@@ -54,24 +58,42 @@ export default {
         }
     },
     computed:{
-        computedHeight(){
+        computedHeight() {
             return `${(this.length/20)-0.3}em`
         },
-        computedTop(){
+        computedTop() {
             return `${this.startTime/20}em`
         },
-        computedLeft(){
+        computedLeft() {
             return `${this.indent+1}vw`
         },
-        computedWidth(){
+        computedWidth() {
             return `${96-(this.indent*8)}%`
         },
-        computedStyle(){
+        computedStyle() {
             if (this.day == -1) return 'time'
             return 'normal-slot';
-        }
-        
+        },
+        computedFont() {
+            // Counting the perceptive luminance - human eye favors green color...
+            if (this.colour.length != 7) return "#646464"
+            var luminance = (0.299 * this.hexToRgb(this.colour).r + 0.587 * this.hexToRgb(this.colour).g + 0.114 * this.hexToRgb(this.colour).b)/255;
+            if (luminance < 0.5)
+                return "#ffffff"
+            else
+                return "#000000"
+        },
     },
+    methods: {
+        hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        },
+    }
 
 }
 </script>
@@ -92,6 +114,8 @@ export default {
         position: absolute;
         width:98%;
         left:-0.95em;
+        overflow: hidden;
+        cursor: pointer;
     }
 
     /*

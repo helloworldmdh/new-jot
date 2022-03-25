@@ -1,11 +1,10 @@
 <template>
-  <div>
+  <div class="timer_page">
     <div class="header">Timer</div>
     <div class="total_time">
       Total time studied: {{ totalTime }} minutes
     </div>
     <div class="clock">
-      <!--to add : a progress bar-->
       <div v-show="timerOn" class="progress">
         <div
           class="progress-bar"
@@ -248,17 +247,17 @@ export default {
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
+.timer_page{
+  height: 90vh;
+}
+
 .header {
-  font-family: "Montserrat", sans-serif;
-  font-size: 56px;
+  font-size: 64px;
   font-weight: 300;
   text-align: center;
 }
-
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-
 .clock {
-  height: 40rem;
+  height: 20vh;
   text-align: center;
 }
 
@@ -283,7 +282,7 @@ export default {
   font-size: 58px;
   font-weight: 300;
   letter-spacing: 0.1em;
-  /* margin-top: 5%; */
+  padding: 5vh 0 2vh 0;
 }
 
 p {
