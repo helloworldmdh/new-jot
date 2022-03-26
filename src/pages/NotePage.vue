@@ -30,7 +30,7 @@
         <div class="module_cards"  v-for="(name,index) in uniqueNames" :key="name">
           <div :style="{'background-color': module_names[index].colour }">
             {{ name }}
-            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': module_names[index].colour }"> {{ n.text }} </div>
+            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': module_names[index].colour }" @click="selectNote(this.n)"> {{ n.title }} </div>
            </div>
         </div>
       </div>
@@ -107,7 +107,7 @@ export default {
         date_created: date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate(),
       }
 
-      const functions = getFunctions(app);
+      const functions = getFunctions(app, 'europe-west2');
       const postNote = httpsCallable(functions, 'postNote');
       await postNote(newnote).then(() => {
         // console.log(result);
@@ -122,7 +122,7 @@ export default {
     },
     
     async getModules() {
-			const functions = getFunctions(app);
+			const functions = getFunctions(app, 'europe-west2');
 			const getModules = httpsCallable(functions, 'getModules')
 			await getModules().then((result) => {
 				this.module_names = result.data.data;
@@ -130,7 +130,7 @@ export default {
 		},
     
     async getNotes(){
-      const functions = getFunctions(app);
+      const functions = getFunctions(app, 'europe-west2');
       const getNotesHttps = httpsCallable(functions, 'getNotes');
       await getNotesHttps().then((result) => {
         this.notes = result.data.data;

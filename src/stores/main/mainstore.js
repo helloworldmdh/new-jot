@@ -7,9 +7,12 @@ export default {
   state(){
     return {
       isSignedIn: false,
+      notes: [],
+      timeSlots: [],
+      modules: [],
+      timeStudied: 0,
     };
-},
-
+  },
   getters,
   mutations,
   actions,

@@ -2,7 +2,7 @@
   <div class="timer_page">
     <div class="header">Timer</div>
     <div class="total_time">
-      Total time studied: {{ totalTime }} minutes
+      Total time studied: {{ computedTime }} minutes
     </div>
     <div class="clock">
       <div v-show="timerOn" class="progress">
@@ -130,9 +130,12 @@ export default {
       let p = this.currProgress + "%";
       return p;
     },
+    computedTime(){
+      return this.$store.getters.getterTotalTime + this.totalTime;
+    },
   },
   created(){
-    this.getTotalTime();
+    this.$store.dispatch('getTotalTime');
   },
   methods: {
     runTimer() {
@@ -210,22 +213,8 @@ export default {
       this.currSeconds = 0;
       this.runTimer;
     },
-    getTotalTime() {
-       const functions = getFunctions(app);
-       const getTotalTime = httpsCallable(functions, "gettotaltime");
-
-      getTotalTime().then((result) => {
-         console.log(result);
-         if (result.data === "No data in database") {
-           return;
-         } else {
-           console.log(result.data);
-           this.totalTime = result.data.data;
-         }
-       });
-     },
-     saveNewTime() {
-      const functions = getFunctions(app);
+    saveNewTime() {
+      const functions = getFunctions(app, 'europe-west2');
       const auth = getAuth(app);
       const saveNewTime = httpsCallable(functions, "saveNewTime");
       // eslint-disable-next-line no-unused-vars
@@ -234,7 +223,7 @@ export default {
       if (!uid) return;
 
       saveNewTime({
-        timeStudied: this.totalTime,
+        timeStudied: this.totalTime + this.$store.getters.getterTotalTime,
         uid: uid,
       }).then((result) => {
         console.log(result);

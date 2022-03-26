@@ -60,7 +60,6 @@ export default {
   z-index: 10;
 }
 
-
 dialog {
   position: fixed;
   top: 20vh;

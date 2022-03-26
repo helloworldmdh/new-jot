@@ -3,55 +3,70 @@
   <div class="setting_page">
     <div class="user_details">
       <div class="user">Email: {{ email }}</div>
-      <!-- <ul class="user">
+      <ul class="user">
         Modules:
-        <li :v-for="module in modules" v-key="index">
-          {{ module }}
+        <li class="mod_names" v-for="m in modules" :key="m">
+          {{ m.name }}
         </li>
-      </ul> -->
+      </ul>
       <div class="user">Total Time Studied: {{ timeStudied }} minutes</div>
-      <button class="password_btn">Change Password</button>
+      <button class="sett_btn pass">Change Password</button>
     </div>
-    <div class="option"></div>
-    <div class="option"></div>
+    <div class="option_one"></div>
+    <div class="option_two">
+      <h3>Delete Account</h3>
+      <p>Warning : This cannot be undone</p>
+      <button class="sett_btn del" @click="toggleWarning">
+        Delete account
+      </button>
+    </div>
+    <div class="backdrop" v-if="warning">
+      <dialog open v-if="warning">
+        <header>Are you sure?</header>
+        <button @click="deleteAccount" class="btn btn-primary m-3">
+          Delete
+        </button>
+        <button @click="toggleWarning" class="btn btn-primary m-3">
+          Cancel
+        </button>
+      </dialog>
+    </div>
   </div>
 </template>
 
 <script>
 import app from "../api/firebase";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { getAuth } from "firebase/auth";
 
 export default {
-  mounted(){
+  mounted() {
     const auth = getAuth(app);
     this.email = auth.currentUser.email;
   },
-  name: 'Settings',
+  name: "Settings",
+  components: {},
   data() {
     return {
-      email: '',
+      email: "",
       modules: [],
       timeStudied: 0,
+      warning: false,
     };
   },
-  created(){
-    this.getTotalTime();
+  async created() {
+    await this.$store.dispatch("getModulesFromServer");
+    await this.$store.dispatch("getTotalTime");
+    this.modules = this.$store.getters.getterModules;
+    this.timeStudied = this.$store.getters.getterTotalTime;
   },
   methods: {
-    getTotalTime() {
-       const functions = getFunctions(app);
-       const getTotalTime = httpsCallable(functions, "gettotaltime");
-
-      getTotalTime().then((result) => {
-         if (result.data === "No data in database") {
-           return;
-         } else {
-           this.timeStudied = result.data.data;
-         }
-       });
-     },
-  }
+    deleteAccount() {
+      console.log("deleted account");
+    },
+    toggleWarning() {
+      this.warning = !this.warning;
+    },
+  },
 };
 </script>
 
@@ -70,14 +85,75 @@ export default {
 }
 
 .user {
-  margin: 0rem 0rem 0.5rem;
+  margin-top: 0.5rem;
+  padding-left: 0rem;
 }
 
-.password_btn {
-  right: 0.5rem;
+.mod_names {
+  margin-left: 6rem;
+  text-decoration: none;
+}
+
+.sett_btn {
+  position: absolute;
   margin: 0.5em;
   border-width: 2px;
   border-color: #6867a1;
   background-color: #f8f8f8;
+}
+
+.pass {
+  right: 1rem;
+  bottom: 1.5rem;
+}
+
+.del {
+  right: 1.2rem;
+}
+
+.option_two {
+  position: relative;
+  display: block;
+  text-align: left;
+  width: 80%;
+  margin: 2rem auto 2rem auto;
+  padding-top: 2rem;
+  height: auto;
+  border-top-style: solid;
+  border-top-color: var(--main-color);
+  border-top-width: 4px;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 10;
+}
+
+dialog {
+  position: absolute;
+  left: 30%;
+  right: auto;
+  top: 30vh;
+  width: 40%;
+  z-index: 100;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background-color: white;
+}
+
+header {
+  background-color: #5fccff;
+  color: white;
+  width: 100%;
+  padding: 1rem;
 }
 </style>

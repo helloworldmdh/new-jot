@@ -71,8 +71,13 @@ export default {
     },
 
     async updateTable(){
+      
       await this.getTimeSlots()
-      await this.getModules()
+      let temp = this.$store.getters.getterTimeSlots;
+      if (temp) this.baseTimeSlots = []
+      await this.$store.dispatch('getModulesFromServer');
+      temp = this.$store.getters.getterModules;
+      if (temp) this.existingModules = []
       this.addColour();
       this.splitByDay();
       this.checkOverlap();
@@ -137,14 +142,6 @@ export default {
     openBox(){
       this.showDialogBox = true;
     },
-
-    async getModules() {
-			const functions = getFunctions(app);
-			const getModules = httpsCallable(functions, 'getModules')
-			await getModules().then((result) => {
-				this.existingModules = result.data.data;
-			})
-		},
     selectSlot(slot){
       this.selected = slot;
       console.log(this.selected);

@@ -12,7 +12,7 @@ exports.getTimeslots = functions.region('europe-west2').https.onCall((data, cont
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-    return admin.firestore().collection('users').doc(uid).get().then(doc => {
+    return admin.firestore().collection('Timeslots').doc(uid).get().then(doc => {
       if (!doc.exists) {
         console.log('No matching documents.');
         return ({ data: 'No user data in database' });
@@ -22,7 +22,7 @@ exports.getTimeslots = functions.region('europe-west2').https.onCall((data, cont
 })
 
 
-exports.setTimeslots = functions.https.onCall((data, context) => {
+exports.setTimeslots = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
@@ -34,47 +34,55 @@ exports.setTimeslots = functions.https.onCall((data, context) => {
     });
 });
 
-exports.addTimeslot = functions.https.onCall((data, context) => {
+exports.addTimeslot = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-    return admin.firestore().collection('users').doc(uid).update({
-      timeSlots: admin.firestore.FieldValue.arrayUnion(data),
+    return admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleName).collection('timeslots').doc(data.timeslotID).set({
+      title: data.title,
+      startTime: data.startTime,
+      length: data.length,
+      day: data.day,
     }).then(() => {
       return ({ data: "Saved TimeSlot to Database" });
     });
 });
 
 
-exports.addModule = functions.https.onCall((data, context) => {
+exports.addModule = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-    return admin.firestore().collection('users').doc(uid).update({
-      modules: admin.firestore.FieldValue.arrayUnion(data),
+    return admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleName).set({
+      colour: data.colour,
+      lecturer: data.lecturer
     }).then(() => {
       return ({ data: "Saved Module to Database" });
     });
 });
 
-exports.getModules = functions.https.onCall((data, context) => {
+exports.getModules = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
+  let array = [];
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-    return admin.firestore().collection('users').doc(uid).get().then(doc => {
-      if (!doc.exists) {
+    return admin.firestore().collection('users').doc(uid).collection('modules').get().then((snapshot) => {
+      if (snapshot.empty) {
         console.log('No matching documents.');
-        return ({ data: 'No user data in database' });
+        throw new functions.https.HttpsError('no-userid', 'The requested users module data was not found');
       }
-      return ({ data: doc.data().modules });
+      snapshot.forEach(doc => {
+        array.push(Object.assign(doc.data(),{name:doc.id}))
+      })
+      return ({ data: array });
     });
 })
 
 
-exports.saveNewTime = functions.https.onCall((data, context) => {
+exports.saveNewTime = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
@@ -82,13 +90,13 @@ exports.saveNewTime = functions.https.onCall((data, context) => {
     return admin.firestore().collection('users').doc(uid).update({
       timeStudied: data.timeStudied,
     }).then(() => {
-      return ({ data: "Saved in modules in Database" });
+      return ({ data: "Saved in Time in Database" });
     });
 });
 
 
 
-exports.gettotaltime = functions.https.onCall((request, context) => {
+exports.gettotaltime = functions.region('europe-west2').https.onCall((request, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
@@ -103,27 +111,22 @@ exports.gettotaltime = functions.https.onCall((request, context) => {
     });
 });
 
-exports.authSignUp = functions.auth.user().onCreate((user) => {
+exports.authSignUp = functions.region('europe-west2').auth.user().onCreate((user) => {
   return admin.firestore().collection('users').doc(user.uid).set({
-    // default values when the user signs up
-    alias: user.email,
-    timeSlots: [],
-    modules: [],
-    notes: [],
     timeStudied: 0,
   })
 });
 
-exports.authDelete = functions.auth.user().onDelete((user) => {
+exports.authDelete = functions.region('europe-west2').auth.user().onDelete((user) => {
   return admin.firestore().collection('users').doc(user.uid).delete();
 });
 
-exports.postNote = functions.https.onCall((data, context) => {
+exports.postNote = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid) {
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   } else {
-    return admin.firestore().collection('users').doc(uid).update({
+    return admin.firestore().collection('Notes').doc(uid).update({
       notes: admin.firestore.FieldValue.arrayUnion(data),
     }).then(() => {
       return ({ data: 'Saved note in database' });
@@ -131,12 +134,12 @@ exports.postNote = functions.https.onCall((data, context) => {
   }
 });
 
-exports.getNotes = functions.https.onCall((_, context) => {
+exports.getNotes = functions.region('europe-west2').https.onCall((_, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-    return admin.firestore().collection('users').doc(uid).get().then(doc => {
+    return admin.firestore().collection('Notes').doc(uid).get().then(doc => {
       if (!doc.exists) {
         console.log('No matching documents.');
         return ({ data: 'No user data in database' });
@@ -147,7 +150,7 @@ exports.getNotes = functions.https.onCall((_, context) => {
     });
 });
 
-exports.deleteUserInfo = functions.https.onCall((data, context) => {
+exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
@@ -157,7 +160,7 @@ exports.deleteUserInfo = functions.https.onCall((data, context) => {
      })
 });
 
-// exports.updateTimeslot = functions.https.onCall((data, context) => {
+// exports.updateTimeslot = functions.region('europe-west2').https.onCall((data, context) => {
 //   const uid = context.auth.uid;
 //   if (!uid)
 //     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
