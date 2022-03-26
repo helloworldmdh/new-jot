@@ -254,5 +254,6 @@ export default ({
 }
 .btn{
 	height: 54px;
+	width: 5rem;
  }
 </style>

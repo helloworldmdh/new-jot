@@ -7,7 +7,7 @@ admin.initializeApp();
 // https://firebase.google.com/docs/functions/write-firebase-functions
 
 
-exports.getTimeslots = functions.https.onCall((data, context) => {
+exports.getTimeslots = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
@@ -146,3 +146,25 @@ exports.getNotes = functions.https.onCall((_, context) => {
       return ({ data: doc.data().notes});
     });
 });
+
+exports.deleteUserInfo = functions.https.onCall((data, context) => {
+  const uid = context.auth.uid;
+  if (!uid)
+    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+  else
+     admin.firestore().collection("users").doc(uid).delete().then(function () {
+        return ({ data: "Document successfully deleted!"});
+     })
+});
+
+// exports.updateTimeslot = functions.https.onCall((data, context) => {
+//   const uid = context.auth.uid;
+//   if (!uid)
+//     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+//   else
+//   return admin.firestore().collection('users').doc(uid).update({ timeSlots: 
+  
+//   }).then(() => {
+//       return ({ data: "Updated document in database" });
+//   });
+// });

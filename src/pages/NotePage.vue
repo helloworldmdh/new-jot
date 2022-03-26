@@ -9,11 +9,11 @@
       <input type="date" :valueAsDate="currentDate" required/>
       <br>
       <label>Module Name:</label>
-      <select v-model="modName" required>
+      <select v-model="note.module_name" required>
         <option v-for="mod in module_names" :key="mod" :value="mod.name">{{ mod.name }}</option>
       </select>
       <br>
-      <label>Note: {{modName}}</label>
+      <label>Note:</label>
       <p class="note_display">{{ notePreview }}</p>
     </div>
     <template #actions>
@@ -30,7 +30,7 @@
         <div class="module_cards"  v-for="(name,index) in uniqueNames" :key="name">
           <div :style="{'background-color': module_names[index].colour }">
             {{ name }}
-            <div v-for="n in notes[index]" :key="n" class="note_details"> {{ n.text }} </div>
+            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': module_names[index].colour }"> {{ n.text }} </div>
            </div>
         </div>
       </div>
@@ -53,9 +53,7 @@ export default {
   },
 
   async mounted(){
-    await this.getNotes();
-    await this.getModules();   
-    this.neatify();
+    this.refreshNotes();
   },
 
   data() {
@@ -69,12 +67,6 @@ export default {
         title: '',
         date_created: '',
       },
-      modName: "",
-      newModule: {
-        name: '',
-        color: '',
-        lecturer: '',
-      },
       dialogBoxShow: false,
     };
   },
@@ -87,13 +79,6 @@ export default {
     }
   },
 
-  watch: {
-    modName(name){
-      this.newModule.name = name;
-      this.note.module_name = name;
-    },
-  },
-
   methods: {
     openDialogBox(){
       this.dialogBoxShow = true;
@@ -101,26 +86,18 @@ export default {
     closeDialogBox(){
       this.dialogBoxShow = false;
     },
+
+    async refreshNotes() {
+      await this.getNotes();
+      await this.getModules();   
+      this.neatify();
+    },
+
     async sendNote(){
-      if (!this.note.module_name) {
-        alert("please add a module name!");
-        return;
-      }
-
-      if (!this.note.text) {
-        alert("please add some text!");
-        return;
-      }
-
-      if (!this.note.title){
-        alert("please give the note a title!");
-        return;
-      }
-
-      if (this.note.text.length > 3000) {
-        alert("please ensure the note is under 3000 characters...");
-        return;
-      }
+      if (!this.note.module_name) return alert("please add a module name!");
+      if (!this.note.text) return alert("please add some text!");
+      if (!this.note.title) return alert("please give the note a title!");
+      if (this.note.text.length > 3000) return alert("please ensure the note is under 3000 characters...");
 
       const date = new Date();
       const newnote = {
@@ -130,27 +107,18 @@ export default {
         date_created: date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate(),
       }
 
-      await this.getModules().then(async () => {
-        if (this.module_names) {
-          var exists = !!this.module_names.find(mod => mod.name == this.newModules.name);
-          console.log(exists)
-          if (!exists) {
-            await this.addModule();
-          }
-        } else {
-          await this.addModule();
-        }
-      })
-
       const functions = getFunctions(app);
       const postNote = httpsCallable(functions, 'postNote');
-      await postNote(newnote).then((result) => {
-        console.log(result);
+      await postNote(newnote).then(() => {
+        // console.log(result);
         this.getNotes();
         this.closeDialogBox();
       }).catch((error) => {
         console.log(error);
       });
+
+      this.refreshNotes();
+      this.resetInputs();
     },
     
     async getModules() {
@@ -166,22 +134,20 @@ export default {
       const getNotesHttps = httpsCallable(functions, 'getNotes');
       await getNotesHttps().then((result) => {
         this.notes = result.data.data;
+        if (!result.data.data) this.notes = [];
       }).catch((error) => {
         console.log(error);
       })
     },
 
-    async addModule() {
-			const functions = getFunctions(app);
-			const addModule = httpsCallable(functions, 'addModule');
-			await addModule(this.newModule).then((result) => {
-				// Read result of the Cloud Function.
-				// /** @type {any} */
-				console.log(result);
-			}).catch((error) => {
-				console.log(error);
-			});
-		},
+    resetInputs(){
+      this.note = {
+        module_name: '',
+        text: '',
+        title: '',
+        date_created: '',
+      }
+    },
 
     neatify(){
       let unique = [...new Set(this.notes.map(item => item.module_name))]; // [ 'A', 'B']
@@ -225,15 +191,16 @@ body {
 .module_cards {
   padding: 1em;
   height: auto;
+  border-radius: 5px;
 }
 
 .note_details {
   padding: 0.5em;
-  margin: 0.2em;
   border: solid;
-  border-color: green;
+  border-color: #ffffff;
   border-width: 2px;
   border-radius: 5px;
+  background-color: #ffffff;
 }
 
 .actn-btn-wrapper .btn-primary{

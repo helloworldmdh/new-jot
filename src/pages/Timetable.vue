@@ -93,8 +93,8 @@ export default {
     },
 
     async getTimeSlots(){
-      const functions = getFunctions(app);
-			const getTimeslots = httpsCallable(functions, 'getTimeslots')
+      const functions = getFunctions(app, 'europe-west2');
+			const getTimeslots = httpsCallable(functions, 'getTimeslots');
 			await getTimeslots().then((result) => {
         if (!result.data.data) {
           this.openBox()
