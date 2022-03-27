@@ -111,16 +111,15 @@ export default {
       //this.formIsValid = this.email.val.includes('@.') && (!this.signIn ? this.confirmedPass.val > 7 : this.password.val > 7);
       this.formIsValid = true;
 
-      this.email.isValid =
-        this.email.val.includes("@") && this.email.val.includes(".");
+      this.email.isValid = this.email.val.includes("@") && this.email.val.includes(".");
       this.password.isValid = this.password.val.length > 7;
       this.confirmedPass.isValid = this.confirmedPass.val === this.password.val;
-
-			return this.formIsValid = this.email.isValid && this.password.isValid && (!this.signIn ? this.confirmedPass.isValid : true);
+      const res = this.formIsValid = this.email.isValid && this.password.isValid && (!this.signIn ? this.confirmedPass.isValid : true)
+			return res;
 		},
 
     submitDetails(){
-      if (!this.validateForm) return;
+      if (!this.validateForm()) return;
       if (this.signIn) this.login();
       else this.signup();
     }, 
@@ -134,9 +133,8 @@ export default {
           });
         })
         .catch((error) => {
-          alert(error.message);
+          console.log(error.message);
         })
-
       } else {
         setPersistence(auth, browserSessionPersistence).then(()=> {
           return signInWithEmailAndPassword(auth, this.email.val, this.password.val);
@@ -162,9 +160,7 @@ export default {
       })
       .catch((error) => {
         alert(error.message);
-      });
-
-      
+      });      
     }
   },
 };
