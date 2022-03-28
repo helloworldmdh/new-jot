@@ -2,31 +2,44 @@ const functions = require("firebase-functions");
 const admin = require('firebase-admin');
 require('cors')({ origin: true });
 admin.initializeApp();
+const db = admin.firestore();
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions  
 
-exports.getTimeslots = functions.region('europe-west2').https.onCall((data, context) => {
-  const uid = context.auth.uid;
-  let array = [];
-  if (!uid)
-    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
-  else
-    return admin.firestore().collection('users').doc(uid).collection('modules').where('name', '!=', '').get().then(snapshot => {
-      snapshot.forEach(async doc => {
-        await admin.firestore().collection('users').doc(uid).collection('modules').doc(doc.id).collection('timeslots').where('length', '!=', -1).get().then(snapshot2 => {
-          snapshot2.forEach(doc2 => {
-            array.push(Object.assign(doc2.data(), {id: doc2.id, modID: doc.id}))
-            console.log("identifier #1", array) 
-          })
-          console.log("Got outside");
-        })
-        console.log("Got more outside");
-      })
-      console.log("Got the most outside")
-      return ({ data: array });
-    });
-  //console.log("I have escaped!")
+exports.getTimeslots = functions.region('europe-west2').https.onCall((data, context) => {  
+  const getData = async () => {
+      const uid = context.auth.uid;
+      let array = [];
+
+      if (!uid) {
+          throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+      } else {
+          const modulesRef = db.collection('users').doc(uid).collection('modules');
+          const modulesQuery = modulesRef.where('name', '!=', '');
+          const modulesQuerySnap = await modulesQuery.get();
+          const moduleDocuments = modulesQuerySnap.docs.map((doc) => ({ id: doc.id }));
+
+          for (const moduleDocument of moduleDocuments) {
+            const timeslotsRef = modulesRef.doc(moduleDocument.id).collection('timeslots');
+            const timeslotsQuery = timeslotsRef.where('length', '!=', -1);
+            const timeslotsQuerySnap = await timeslotsQuery.get();
+            const timeslotDocuments = timeslotsQuerySnap.docs.map((doc) => ({ id: doc.id, data: doc.data() })); 
+            
+
+              for (const timeslotDocument of timeslotDocuments) {
+                array.push(Object.assign(timeslotDocument.data, {id: timeslotDocument.id, modID: moduleDocument.id}))
+              }
+          }
+          return ({ data: array });
+      }
+  }
+
+  return getData()
+  .then((response) => { 
+      // console.log(response);
+      return response;
+  });
 })
 
 
