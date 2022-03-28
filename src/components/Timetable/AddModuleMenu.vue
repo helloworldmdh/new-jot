@@ -208,7 +208,6 @@ export default {
             this.clearMenu();
           });
         });
-
       });
     },
 

@@ -11,7 +11,6 @@ exports.getTimeslots = functions.region('europe-west2').https.onCall((data, cont
   const getData = async () => {
       const uid = context.auth.uid;
       let array = [];
-
       if (!uid) {
           throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
       } else {
@@ -34,26 +33,12 @@ exports.getTimeslots = functions.region('europe-west2').https.onCall((data, cont
           return ({ data: array });
       }
   }
-
   return getData()
   .then((response) => { 
       // console.log(response);
       return response;
   });
 })
-
-
-// exports.setTimeslots = functions.region('europe-west2').https.onCall((data, context) => {
-//   const uid = context.auth.uid;
-//   if (!uid)
-//     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
-//   else
-//     return admin.firestore().collection('users').doc(uid).update({
-//       timeSlots: data.newTimeSlots,
-//     }).then(() => {
-//       return ({ data: "Saved TimeSlot to Database" });
-//     });
-// });
 
 exports.addTimeslot = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
@@ -69,7 +54,6 @@ exports.addTimeslot = functions.region('europe-west2').https.onCall((data, conte
       return ({ data: "Saved TimeSlot to Database" });
     });
 });
-
 
 exports.addModule = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
@@ -117,7 +101,6 @@ exports.saveNewTime = functions.region('europe-west2').https.onCall((data, conte
 });
 
 
-
 exports.gettotaltime = functions.region('europe-west2').https.onCall((request, context) => {
   const uid = context.auth.uid;
   if (!uid)
@@ -159,21 +142,6 @@ exports.addNote = functions.region('europe-west2').https.onCall((data, context) 
     });
 });
 
-// exports.getNotes = functions.region('europe-west2').https.onCall((_, context) => {
-//   const uid = context.auth.uid;
-//   if (!uid)
-//     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
-//   else
-//     return admin.firestore().collection('Notes').doc(uid).get().then(doc => {
-//       if (!doc.exists) {
-//         console.log('No matching documents.');
-//         return ({ data: 'No user data in database' });
-//       }
-//       // console.log(snapshot)
-//       // 2. Send data back to client
-//       return ({ data: doc.data().notes});
-//     });
-// });
 
 exports.getNotes = functions.region('europe-west2').https.onCall((data, context) => {  
   const getData = async () => {
@@ -209,6 +177,16 @@ exports.getNotes = functions.region('europe-west2').https.onCall((data, context)
   });
 })
 
+exports.deleteNote = functions.region('europe-west2').https.onCall((data, context) => {
+  const uid = context.auth.uid;
+  if (!uid)
+    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+  else
+    admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleID).collection('notes').doc(data.noteID).delete().then(() => {
+      return ({data: 'Document successfully deleted!'});
+    });
+});
+
 exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
@@ -218,15 +196,3 @@ exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, co
         return ({ data: "Document successfully deleted!"});
      })
 });
-
-// exports.updateTimeslot = functions.region('europe-west2').https.onCall((data, context) => {
-//   const uid = context.auth.uid;
-//   if (!uid)
-//     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
-//   else
-//   return admin.firestore().collection('timeslots').doc(data.timeslotID).update({
-  
-//   }).then(() => {
-//       return ({ data: "Updated document in database" });
-//   });
-// });

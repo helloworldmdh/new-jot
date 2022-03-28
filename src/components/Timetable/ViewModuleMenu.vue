@@ -1,5 +1,9 @@
 <template>
-  <base-dialog title="Selected Timeslot" @close="editing = false">
+  <base-dialog
+    title="Selected Timeslot"
+    :colour="currSlot.colour"
+    @close="editing = false"
+  >
     <div class="dialog_container">
       <div class="detail_labels">
         <div class="time_d">Title</div>
@@ -9,31 +13,30 @@
         <div class="time_d">Lecturer</div>
       </div>
       <div class="info" v-if="!editing">
-        <div class="time_i">{{ slot_title }}</div>
-        <div class="time_i">{{ mod_name }}</div>
+        <div class="time_i">{{ currSlot.title }}</div>
+        <div class="time_i">{{ currModule.name }}</div>
         <div class="time_i">{{ formatTime }}</div>
         <div class="time_i">{{ changeDay }}</div>
-        <div class="time_i">{{ lecturer }}</div>
+        <div class="time_i">{{ currModule.lecturer }}</div>
       </div>
       <div class="mod_inputs" v-else>
         <div class="mod_inputs">
           <input
             type="text"
             class="input_box_title"
-            v-model.trim="slotInEdit.slot_title"
+            v-model.trim="slotInEdit.title"
             required
-          /><br>
+          /><br />
 
           <input
             type="text"
             class="input_box_modname"
-            v-model.trim="slotInEdit.mod_name"
+            v-model="moduleInEdit.name"
             required
           />
-        <!--<datalist id="modnames">
-					<option v-for="mod in existingModules" :key="mod"> {{ slotInEdit.name }}</option>
-				</datalist>-->
-
+          <datalist id="modnames">
+            <option v-for="mod in temp_module" :key="mod">{{ mod.name }}</option>
+          </datalist>
           <input
             type="color"
             class="input_box_color"
@@ -52,7 +55,7 @@
             v-model="endTimeString"
             required
           /><br />
-          <select class="input_box" v-model="slotInEdit.day" :value="slotInEdit.day" required>
+          <select class="input_box" :v-model="slotInEdit.day" required>
             <option v-for="d in days" :key="d">
               {{ d }}
             </option></select
@@ -60,7 +63,7 @@
           <input
             type="text"
             class="input_box"
-            v-model.trim="slotInEdit.lecturer"
+            v-model.trim="moduleInEdit.lecturer"
             required
           /><br />
         </div>
@@ -72,6 +75,7 @@
     </template>
     <template #actions v-else>
       <button class="btn btn-primary m-3" @click="edit">Cancel</button>
+      <button class="btn btn-primary m-3" @click="updateSlot">Update</button>
     </template>
   </base-dialog>
 </template>
@@ -82,21 +86,18 @@ export default {
   data() {
     return {
       editing: false,
-      lecturer: "________",
       startTimeString: "",
       endTimeString: "",
       slotInEdit: {
-        slot_title: this.slot_title,
-        mod: this.mod_name,
-        day: this.day,
-        startTime: this.startTime,
-        length: this.time_length,
-        colour: "#47C6FF",
-        lecturer: "",
+        title: "",
+        module: "",
+        colour: "",
       },
       currModule: {
+        
       },
-      tempModule: {},
+      moduleInEdit: {},
+      tempModule: [],
       days: [
         "Monday",
         "Tuesday",
@@ -108,17 +109,10 @@ export default {
       ],
     };
   },
-  created() {
-      const temp_modules = this.$store.getters.getterModules;
-      if (temp_modules.length !== 0) {
-        this.currModule = temp_modules.find(({ id }) => id == this.mod_name);
-        this.tempModule = this.currModule;
-      }
-  },
   computed: {
     changeDay() {
       var day_name = "";
-      switch (this.day) {
+      switch (this.slotInEdit.day) {
         case 0:
           day_name = "Monday";
           break;
@@ -139,13 +133,14 @@ export default {
           break;
         case 6:
           day_name = "Sunday";
+          break;
       }
       return day_name;
     },
     formatTime() {
       let fulltime = "";
-      let startTime = this.convertTime(this.sTime);
-      let endTime = this.convertTime(this.sTime + this.time_length);
+      let startTime = this.convertTime(this.currSlot.startTime);
+      let endTime = this.convertTime(this.currSlot.startTime + this.currSlot.length);
       fulltime = startTime + " - " + endTime;
       return fulltime;
     },
@@ -161,70 +156,49 @@ export default {
     edit() {
       this.editing = !this.editing;
     },
-    // splitStartTimeString(string) {
-    //   if (string != null){
-    //   const splitTimeString = string.split(":");
-    //   this.slotInEdit.startTime =
-    //     +splitTimeString[0] * 60 + +splitTimeString[1];
-    //   }
-    // },
-    // convertEndTimeString(string) {
-    //   if (string != null){
-    //   const splitTimeString = string.split(":");
-    //   this.slotInEdit.length =
-    //     +splitTimeString[0] * 60 +
-    //     +splitTimeString[1] -
-    //     this.slotInEdit.startTime;
-    //   }
-    // },
-    // submit(){
-    //   this.$store.dispatch('getModulesFromServer').then(async () => {
-    //     const payload = {
-    //       moduleName: this.newModule.name,
-    //       colour: this.newModule.colour,
-    //       lecturer: this.newModule.lecturer,
-    //     };
-
-    //     if (this.existingModules) {
-    //       var exists = !!this.existingModules.find(
-    //         (mod) => mod.name == this.newModule.name
-    //       );
-    //       if (!exists) {
-    //         await this.$store.dispatch('addModule', payload);
-    //       }
-    //     } else {
-    //       await this.$store.dispatch('updateModule', payload);
-    //     }
-    //     this.$store.dispatch('getModulesFromServer').then(() => {
-    //       const payload = {
-    //         moduleID: this.$store.getters.getterModules.find((mod) => mod.name == this.newTimeSlot.mod).id,
-    //         title: this.newTimeSlot.title,
-    //         startTime: this.newTimeSlot.startTime,
-    //         length: this.newTimeSlot.length,
-    //         day: this.newTimeSlot.day,
-    //       };
-
-    //       this.$store.dispatch("updateTimeslot", payload).then(() => {
-    //         this.close();
-    //         this.clearMenu();
-    //       });
-    //     });
-
-    //   });
-    // },
+    async updateSlot(){ //Object.is(ob1, ob2) -> true if equal, false if not
+      console.log("I am being called! YAYAYYAYAYAY");
+      if (this.currModule !== this.moduleInEdit){
+        await this.$store.dispatch('addModule', this.moduleInEdit);
+      }
+      console.log(this.currSlot, this.slotInEdit, !Object.is(this.currSlot, this.slotInEdit), this.currSlot !== this.slotInEdit);
+      if (this.currSlot !== this.slotInEdit){
+        console.log("Not same")
+      const newSlot = {
+            moduleID: this.moduleInEdit.moduleID,
+            title: this.slotInEdit.title,
+            startTime: this.slotInEdit.startTime,
+            length: this.slotInEdit.length,
+            day: this.slotInEdit.day,
+            id: this.slotInEdit.id
+          };
+      
+          this.$store.dispatch("addSlot", newSlot).then(() => {
+            this.edit();
+        });
+       }else{ 
+        this.edit();
+      }
+    }
+  },
+  watch: {
+    currSlot(){
+      const temp_modules = this.$store.getters.getterModules;
+      this.temp_module = temp_modules;
+      this.slotInEdit = this.currSlot;
+      console.log(this.slotInEdit,"Slot")
+      console.log(this.currSlot,"Differ");
+      if (temp_modules.length != 0) {
+        this.currModule = temp_modules.find( mod => mod.id == this.currSlot.modID);
+        this.moduleInEdit = this.currModule;
+      }
+      this.startTimeString = this.convertTime(this.currSlot.startTime);
+      this.endTimeString = this.convertTime(this.currSlot.startTime+this.currSlot.length);
+    }
   },
   props: {
-    mod_name: {
-      type: String,
-    },
-    slot_title: {
-      type: String,
-    },
-    sTime: {
-      type: Number,
-    },
-    day: {
-      type: Number,
+    currSlot: {
+      type: Object,
     },
     time_length: {
       type: Number,

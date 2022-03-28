@@ -24,8 +24,6 @@ export default {
   async getModulesFromServer(context) {
     const getModules = httpsCallable(functions, 'getModules')
     await getModules().then((result) => {
-      console.log("from getModulesFromServer");
-      console.log(result.data.data);
       context.commit('setModules', result.data.data);
     }).catch((error) => {
       console.log(error);
@@ -65,7 +63,7 @@ export default {
     const id = uniqid();
     await addTimeslot({
       moduleID: payload.moduleID,
-      timeslotID: id,
+      timeslotID: payload.id ? payload.id : id,
       title: payload.title,
       startTime: payload.startTime,
       length: payload.length,
@@ -126,7 +124,7 @@ export default {
     const id = uniqid();
     await addNote({
       moduleID: payload.modID,
-      noteID: id,
+      noteID: payload.id ? payload.id : id,
       title: payload.title,
       date: payload.date,
       text: payload.text,
@@ -134,10 +132,18 @@ export default {
         // Read result of the Cloud Function.
         // /** @type {any} */
         console.log(result);
-      })
-      .catch((error) => {
+      }).catch((error) => {
         console.log(error);
       });
   },
+
+  async deleteNote(context, payload) {
+    const deleteNote = httpsCallable(functions, "deleteNote");
+    await deleteNote(payload).then(result => {
+      console.log(result);
+    }).catch((error)=>{
+      console.log(error);
+    })
+  }
 
 }

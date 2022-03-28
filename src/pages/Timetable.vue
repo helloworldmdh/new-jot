@@ -1,16 +1,13 @@
 <template>
+<div id="main_container">
   <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTableAndClose"></add-module-menu>
   <a class="floating-btn" @click="openBox">+</a>
   <view-module-menu :show="slotSelect" @close="unselect" 
-    :slot_title="selected.title"
-    :mod_name="selected.mod"
-    :sTime="selected.startTime"
-    :day="selected.day"
-    :time_length="selected.length"
+    :currSlot="selected"
   />
   <div class="timetable">
     <div class="time-column">
-        <time-slot v-for="i in 24" :key="i"
+        <time-slot v-for="i in 24" :key="i" :id="i"
         :lectureTitle="i-1+':00'"
         :length="60"
         :startTime="(i-1)*60"
@@ -33,6 +30,7 @@
         </time-slot>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -49,6 +47,9 @@ export default {
     TimeSlot,
     AddModuleMenu,
     ViewModuleMenu,
+  },
+  mounted(){
+    document.getElementById('15').scrollIntoView({block: 'center'});
   },
   created(){
     this.updateTable();
@@ -85,8 +86,7 @@ export default {
     addColour() {
       this.colourTimeSlots = this.baseTimeSlots;
       this.baseTimeSlots.forEach((slot, index)=> {
-        console.log(this.existingModules)
-          this.colourTimeSlots[index].colour = this.existingModules.find(mod => mod.id == slot.modID).colour
+        this.colourTimeSlots[index].colour = this.existingModules.find(mod => mod.id == slot.modID).colour
       })
     },
 
@@ -130,7 +130,6 @@ export default {
     },
     selectSlot(slot){
       this.selected = slot;
-      console.log(this.selected);
       this.slotSelect = true;
     },
     unselect(){
@@ -162,7 +161,7 @@ export default {
             length: 1440,
             location: "",
             module: "",
-            colour: "rgba(128, 128, 128, 0.1)",
+            colour: "rgba(128, 128, 128, 0.2)",
             indent: 0,
           },
         ],
@@ -174,7 +173,7 @@ export default {
             length: 1440,
             location: "",
             module: "",
-            colour: "rgba(128, 128, 128, 0.1)",
+            colour: "rgba(128, 128, 128, 0.2)",
             indent: 0,
           },
         ],
@@ -186,7 +185,7 @@ export default {
             length: 1440,
             location: "",
             module: "",
-            colour: "rgba(128, 128, 128, 0.1)",
+            colour: "rgba(128, 128, 128, 0.2)",
             indent: 0,
           },
         ],
@@ -198,7 +197,7 @@ export default {
             length: 1440,
             location: "",
             module: "",
-            colour: "rgba(128, 128, 128, 0.1)",
+            colour: "rgba(128, 128, 128, 0.2)",
             indent: 0,
           },
         ],
@@ -210,7 +209,7 @@ export default {
             length: 1440,
             location: "",
             module: "",
-            colour: "rgba(128, 128, 128, 0.1)",
+            colour: "rgba(128, 128, 128, 0.2)",
             indent: 0,
           },
         ],
@@ -222,7 +221,7 @@ export default {
             length: 1440,
             location: "",
             module: "",
-            colour: "rgba(128, 128, 128, 0.1)",
+            colour: "rgba(128, 128, 128, 0.2)",
             indent: 0,
           },
         ],
@@ -234,7 +233,7 @@ export default {
             length: 1440,
             location: "",
             module: "",
-            colour: "rgba(128, 128, 128, 0.1)",
+            colour: "rgba(128, 128, 128, 0.2)",
             indent: 0,
           },
         ],
@@ -280,7 +279,7 @@ export default {
   position: relative;
   border-right-color: #d4d4d4;
   border-right-style: dashed;
-  height: 67em;
+  height: 90em;
   border-width: 2px;
 }
 .time-column{
@@ -290,7 +289,7 @@ export default {
   position: relative;
   border-right-color: #d4d4d4;
   border-right-style: dashed;
-  height: 67em;
+  height: 90em;
   border-width: 2px;
 }
 
@@ -302,7 +301,7 @@ export default {
   border-right-color: #d4d4d4;
   background: rgb(241, 241, 241);
   border-right-style: dashed;
-  height: 67em;
+  height: 90em;
   border-width: 2px;
 }
 

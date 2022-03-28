@@ -2,25 +2,23 @@
   <teleport to="body">
     <div v-if="show" @click="tryClose" class="backdrop"></div>
     <dialog open v-if="show">
-      <header :style="{'background-color': colour, 'color': computedFont}">
+      <header :style="{'background-color': colour}">
         <slot name="header">
           <h2>{{ title }}</h2>
+          <box-icon class="icon_style" name='pencil' size="cssSize" color="white" animation="tada-hover" @click="tryEdit"></box-icon>
+          <box-icon class="delete_style" name='trash' size="cssSize" color="white" animation="tada-hover" @click="tryDelete"></box-icon>
         </slot>
       </header>
       <section>
-        <slot></slot>
+        <div class="text_output" v-html="convertFromMD"></div>
       </section>
-      <menu>
-        <slot name="actions">
-          
-        </slot>
-        <button class="btn btn-primary m-3" @click="tryClose">Close</button>
-      </menu>
     </dialog>
   </teleport>
 </template>
 
 <script>
+import { marked } from 'marked'
+
 export default {
   props: {
     show: {
@@ -31,43 +29,31 @@ export default {
       type: String,
       required: false,
     },
-    fixed: {
-      type: Boolean,
-      required: false,
-      default: false,
+    text:{
+      type: String,
+      required: true,
     },
     colour: {
       type: String,
-      required: false,
-      default: "#5fccff"
+      required: true,
     }
   },
-  emits: ['close'],
+  emits: ['closePreviewPage', 'editNote', 'deleteNote'],
+  computed: {
+    convertFromMD() {
+      return marked(this.text, { breaks: true, smartypants: true});
+    }
+  },
   methods: {
     tryClose() {
-      if (this.fixed) {
-        return;
-      }
-      this.$emit('close');
+      console.log(this.colour)
+      this.$emit('closePreviewPage');
     },
-    hexToRgb(hex) {
-      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      } : null;
+    tryEdit() {
+      this.$emit('editNote');
     },
-  },
-  computed: {
-    computedFont() {
-      // Counting the perceptive luminance - human eye favors green color...
-      if (this.colour.length != 7) return "#646464"
-      var luminance = (0.299 * this.hexToRgb(this.colour).r + 0.587 * this.hexToRgb(this.colour).g + 0.114 * this.hexToRgb(this.colour).b)/255;
-      if (luminance < 0.5)
-        return "#ffffff"
-      else
-        return "#000000"
+    tryDelete() {
+      this.$emit('deleteNote');
     },
   },
 };
@@ -100,6 +86,7 @@ dialog {
 }
 
 header {
+  text-align: center;
   background-color: #5fccff;
   color: white;
   width: 100%;
@@ -108,6 +95,20 @@ header {
 
 header h2 {
   margin: 0;
+}
+
+.icon_style{
+  position: absolute;
+  width: 3rem;
+  right: 1rem;
+  top: 1rem;
+}
+
+.delete_style{
+  position: absolute;
+  width: 3rem;
+  right: 5rem;
+  top: 1rem;
 }
 
 section {
@@ -123,8 +124,12 @@ menu {
 
 @media (min-width: 768px) {
   dialog {
-    left: calc(50% - 20rem);
-    width: 40rem;
+    left: calc(50% - 35rem);
+    width: 70rem;
   }
+}
+
+.text_output{
+  text-align: left;
 }
 </style>

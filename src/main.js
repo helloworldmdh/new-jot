@@ -11,7 +11,7 @@ import { getAuth } from 'firebase/auth';
 import BaseButton from './components/UI/BaseButton.vue';
 import BaseCard from './components/UI/BaseCard.vue';
 import BaseDialog from './components/UI/BaseDialog.vue';
-//import '@fortawesome/fontawesome-free/js/all'
+
 
 const store = createStore(mainstore);
 
@@ -21,34 +21,7 @@ const router = createRouter({
 })
 
 
-
-// router.beforeEach((to, from, next) => {
-//     if (to.matched.some(record => record.meta.requiresAuth)) {
-//         // this route requires auth, check if logged in
-//         // if not, redirect to login page.
-//         if (!store.getters.isSignedIn) {
-//             next({ path: '/login' })
-//         } else {
-//             next() // go to wherever I'm going
-//         }
-//     }
-//     else if (to.matched.some(record => record.meta.requiresNoAuth)) {
-//         // this route requires auth, check if logged in
-//         // if not, redirect to login page.
-//         if (store.getters.isSignedIn) {
-//           next({ path: '/' })
-//         } else {
-//           next() // go to wherever I'm going
-//         }
-//     }
-//     else {
-//       next() // does not require auth, make sure to always call next()!
-//     }
-// })
-
 router.beforeEach(function(to, _, next){
-    // console.log(to.meta.requiresNoAuth);
-    // console.log(store.getters.isSignedIn);
     const auth = getAuth(fb_app);
     auth.onAuthStateChanged(user => {
         if (to.meta.requiresAuth && !user) {
@@ -70,4 +43,3 @@ app.component('base-dialog', BaseDialog)
 app.use(router);
 app.use(store);
 app.mount('#app');
-

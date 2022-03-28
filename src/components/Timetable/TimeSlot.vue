@@ -59,10 +59,10 @@ export default {
     },
     computed:{
         computedHeight() {
-            return `${(this.length/20)-0.3}em`
+            return `${(this.length/15)-0.3}em`
         },
         computedTop() {
-            return `${this.startTime/20}em`
+            return `${this.startTime/15}em`
         },
         computedLeft() {
             return `${this.indent+1}vw`

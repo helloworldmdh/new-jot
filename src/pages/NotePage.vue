@@ -1,4 +1,13 @@
 <template>
+  <preview-page 
+    :show="previewPageOpen" 
+    :title="selectedNote.title" 
+    :text="selectedNote.text" 
+    :colour="selectedNote.colour"
+    @deleteNote="deleteNote"
+    @closePreviewPage="closePreviewPage" 
+    @editNote="editNote" >
+  </preview-page>
   <plus-icon @plusclicked="openDialogBox"></plus-icon>
   <base-dialog :show="dialogBoxShow" @close="closeDialogBox" title="Note Preview">
     <div class="dialog_content_wrapper">
@@ -14,7 +23,9 @@
       </select>
       <br>
       <label>Note:</label>
-      <p class="note_display">{{ notePreview }}</p>
+      <div>
+        <p class="note_display">{{ notePreview }}</p>
+      </div>
     </div>
     <template #actions>
       <div class="actn-btn-wrapper">
@@ -26,20 +37,18 @@
     <base-card> Note Page </base-card>
     <div class="notes_container">
       <div class="module_selection">
-        <h3 class="title">Modules</h3>
-        <div class="module_cards"  v-for="(name,index) in uniqueNames" :key="name">
-          <div :style="{'background-color': modules[index].colour }">
-            {{ name }}
-            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': modules[index].colour }" @click="selectNote(this.n)"> {{ n.title }} </div>
+        <h3 class="mod_title">Modules</h3>
+        <div class="module_cards"  v-for="(mod,index) in uniqueNames" :key="mod">
+          <div :style="{'background-color': uniqueNames[index].colour }">
+            {{ mod.name }}
+            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': uniqueNames[index].colour }" @click="selectNote(n, uniqueNames[index].colour)"> {{ n.title }} </div>
            </div>
         </div>
       </div>
+      <button class="btn btn-primary" v-if="currentlyEditing" @click="cancelEditing">Cancel Editing</button>
       <div class="note_taking">
-        <button class="btn btn-primary m-3 btn_one options">U</button>
-        <button class="btn btn-primary m-3 btn_two options">I</button>
-        <button class="btn btn-primary m-3 btn_three options">B</button>
-        <input ref="font_color" type="color" class="input_color options"/><br>
-        <textarea class="text" placeholder="Start typing here..." v-model="note.text" @click="toggleColor"></textarea>
+        <textarea class="text" v-model="note.text" placeholder="Start typing here.." :style="{ width: computedWidth}" />
+        <m-d-guide/>
       </div>
     </div>
   </div>
@@ -47,19 +56,21 @@
 
 <script>
 import PlusIcon from '../components/UI/PlusIcon.vue';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import app from '../api/firebase.js';
+import PreviewPage from '../components/Notes/PreviewPage.vue'
+import MDGuide from '../components/Notes/MDguide.vue'
+import { guideWidth } from '../components/Notes/MDguide.js'
 
 export default {
   name: "NotePage",
   components: {
     PlusIcon,
+    PreviewPage,
+    MDGuide,
   },
-
-  async mounted(){
-    this.refreshNotes();
+  async mounted () {
+    await this.refreshNotes()
+    console.log(this.notes);
   },
-
   data() {
     return {
       uniqueNames: [],
@@ -70,8 +81,12 @@ export default {
         text: '',
         title: '',
         date: '',
+        id: null,
       },
+      selectedNote:{},
       dialogBoxShow: false,
+      previewPageOpen: false,
+      currentlyEditing: false,
     };
   },
   watch:{
@@ -81,8 +96,11 @@ export default {
     notePreview(){
       return this.note.text.length > 200 ? this.note.text.substring(0,200) + "..." : this.note.text;
     },
+    computedWidth(){
+        var newWidth = 80 - parseInt(guideWidth.value);
+        return newWidth;
+    }
   },
-
   methods: {
     openDialogBox(){
       this.dialogBoxShow = true;
@@ -91,56 +109,71 @@ export default {
       this.dialogBoxShow = false;
     },
 
+    editNote() {
+      this.closePreviewPage();
+      console.log(this.selectedNote)
+      this.currentlyEditing = true;
+      this.note.text = this.selectedNote.text;
+      this.note.id = this.selectedNote.id;
+      this.note.title = this.selectedNote.title;
+      this.note.moduleID = this.selectedNote.modID;
+      this.note.date= this.selectedNote.date;
+    },
+
+    cancelEditing() {
+      this.resetInputs()
+      this.currentlyEditing = false;
+      this.note.id = null
+    },
+
     async refreshNotes() {
-      await this.getNotes();
-      await this.getModules();   
-      this.neatify();
+      await this.$store.dispatch('getModulesFromServer');
+      await this.$store.dispatch('getNotes');
+      this.modules = this.$store.getters.getterModules;
+      this.notes = this.$store.getters.getterNotes;  
+      this.sortByModule();
+      this.resetInputs();
     },
     
     async sendNote(){
-      console.log(this.modules)
-      console.log(this.note)
       if (!this.note.moduleID) return alert("please add a module name!");
       if (!this.note.text) return alert("please add some text!");
       if (!this.note.title) return alert("please give the note a title!");
       if (this.note.text.length > 3000) return alert("please ensure the note is under 3000 characters...");
+
+  
 
       const newnote = {
         modID: this.note.moduleID,
         text: this.note.text,
         title: this.note.title,
         date: this.note.date,
+        id: this.note.id
       }
+      console.log(newnote)
 
-      await this.$store.dispatch('addNote', newnote).then((result) => {
-        console.log(result);
-        this.getNotes();
+      await this.$store.dispatch('addNote', newnote).then(async () => {
+        this.refreshNotes();
         this.closeDialogBox();
+        this.cancelEditing();
       }).catch((error) => {
         console.log(error);
       });
 
+    },
+
+    async deleteNote(){
+      await this.$store.dispatch('deleteNote', {
+        moduleID: this.selectedNote.modID,
+        noteID: this.selectedNote.id,
+      });
+      this.closePreviewPage();
       this.refreshNotes();
-      this.resetInputs();
     },
     
-    async getModules() {
-			const functions = getFunctions(app, 'europe-west2');
-			const getModules = httpsCallable(functions, 'getModules')
-			await getModules().then((result) => {
-				this.modules = result.data.data;
-			})
-		},
-    
-    async getNotes(){
-      const functions = getFunctions(app, 'europe-west2');
-      const getNotesHttps = httpsCallable(functions, 'getNotes');
-      await getNotesHttps().then((result) => {
-        this.notes = result.data.data;
-        if (!result.data.data) this.notes = [];
-      }).catch((error) => {
-        console.log(error);
-      })
+    selectNote(note, colour){
+      this.selectedNote = Object.assign(note, {colour: colour});
+      this.previewPageOpen = true;
     },
 
     resetInputs(){
@@ -152,45 +185,43 @@ export default {
       }
     },
 
-    neatify(){
-      // // let unique = [...new Set(this.notes.map(item => item.moduleID))]; // [ 'A', 'B']
-      // // this.uniqueNames = unique;
+    sortByModule() {
+      const groupBy = function(xs, key) {
+        return xs.reduce(function(rv, x) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+        }, {});
+      };
+      
+      let obj = groupBy(this.notes, 'modID');
+      let newArr = [];
 
-      // const groupBy = function(xs, key) {
-      //   return xs.reduce(function(rv, x) {
-      //   (rv[x[key]] = rv[x[key]] || []).push(x);
-      //   return rv;
-      //   }, {});
-      // };
-      // let obj = groupBy(this.notes, 'moduleID');
-      // let newArr = [];
+      Object.keys(obj).forEach(key => {
+        newArr.push(obj[key]);
+      });    
 
-      // Object.keys(obj).forEach(key => {
-      //   newArr.push(obj[key]);
-      // });    
+      this.notes = newArr;
 
-      // this.notes = newArr;
+      this.sortToUniqueNames()
     },
-    // toggleBold(){
-    //   document.execCommand('bold');
-    // },
-    // toggleUnderline(){
-    //   this.execCommand("underline");
-    // },
-    // toggleItalic(){
-    //   this.execCommand("italic");
-    // },
-    // toggleColor(){
-    //   this.execCommand("forecolor", false, this.$refs["font_color"]);
-    //   console.log( this.$refs["font_color"]);
-    // }
-  },  
 
-  
+    sortToUniqueNames(){
+      this.uniqueNames = [];
+      this.notes.forEach(Omod => {
+        this.uniqueNames.push({
+          name: this.modules.find((mod) => mod.id == Omod[0].modID).name,
+          colour: this.modules.find((mod) => mod.id == Omod[0].modID).colour})
+      })
+    },
+
+    closePreviewPage(){
+      this.previewPageOpen = false;
+    }, 
+  },  
 };
 </script>
 
-<style>
+<style scoped>
 body {
   text-align: center;
 }
@@ -199,8 +230,6 @@ body {
   text-align: justify;
   text-align-last: center;
 }
-
-
 
 .module_cards {
   padding: 1em;
@@ -222,20 +251,26 @@ body {
 }
 
 .notes_container {
-  column-count: 5;
+  width:95vw;
+  height: 65vh;
 }
 
 .module_selection{
-  width: 20vw;
-  height: 80vh;
+  float: left;
+  width: 20%;
+  height: 90vh;
+  margin: 0 0 0;
   border-right-style: solid;
   border-right-width: 2px;
-  border-right-color: var(--accent-one);
+  border-right-color: #0a0053;
 }
 
-.title{
+.mod_title{
   text-align: left;
-  margin-left: 1rem;
+  padding-left: 1rem;
+  padding-bottom:0.4rem;
+  border-bottom: 1px solid #0a0053;
+  border-top: 1px solid #0a0053;
 }
 
 .dialog_content_wrapper label {
@@ -247,29 +282,13 @@ body {
 }
 
 .note_taking{
-  border-top: 2px solid var(--accent-one);
-  width: 70vw;
-  height: 80vh;
+  float: left;
+  border-top: 2px solid #0a0053;
+  padding-left: 1rem;
+  height: 65vh;
+  width: 80%;
 } 
 
-.options{
-  top: 8rem;
-  height: 39px;
-  width: 40px;
-  position: absolute;
-}
-
-.btn_one{
-  right: 4rem;
-}
-
-.btn_two{
-  right: 7rem;
-}
-
-.btn_three{
-  right: 10rem;
-}
 
 .input_color{
   margin-top: 1rem;
@@ -278,14 +297,12 @@ body {
   padding: 0 0 0;
 }
 
-.text {
+.text{
   border: 0px;
   margin-top: 2rem;
-  width: 65vw;
+  width: 100%;
   height: 80vh;
-  column-span: 4;
   resize: none;
-  padding: 1vh 3vw;
   outline: none;
 }
 </style>

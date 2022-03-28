@@ -2,7 +2,7 @@
   <div class="timer_page">
     <div class="header">Timer</div>
     <div class="total_time">
-      Total time studied: {{ computedTime }} minutes
+      Total time studied:<br> {{ computedTime }} minutes
     </div>
     <div class="clock">
       <div v-show="timerOn" class="progress">
@@ -15,9 +15,9 @@
           aria-valuemax="100"
         ></div>
       </div>
-      <div class="time">
-        <h1 v-if="timerOn == true && studyOrRest == false">Time to Study</h1>
-        <h1 v-else-if="timerOn == true && studyOrRest == true">Time to Rest</h1>
+      <div class="time" v-if="timerOn == true">
+        <h1 v-if="studyOrRest == false">Time to Study</h1>
+        <h1 v-else-if="studyOrRest == true">Time to Rest</h1>
         <h1 v-if="completed">Well Done</h1>
         <p id="minutes">{{ minutes }}</p>
         <p>:</p>
@@ -272,6 +272,10 @@ export default {
   font-weight: 300;
   letter-spacing: 0.1em;
   padding: 5vh 0 2vh 0;
+}
+
+.input{
+   margin: 10vh 0 2vh 0;
 }
 
 p {
