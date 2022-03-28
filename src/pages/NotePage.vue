@@ -6,11 +6,11 @@
       <input type="text" placeholder="title" v-model="note.title" required/>
       <br>
       <label>Date Created:</label>
-      <input type="date" :valueAsDate="currentDate" required/>
+      <input type="date" v-model="note.date" required/>
       <br>
       <label>Module Name:</label>
-      <select v-model="note.module_name" required>
-        <option v-for="mod in module_names" :key="mod" :value="mod.name">{{ mod.name }}</option>
+      <select v-model="note.moduleID" required>
+        <option v-for="mod in modules" :key="mod.id" :value="mod.id">{{ mod.name }}</option>
       </select>
       <br>
       <label>Note:</label>
@@ -28,14 +28,18 @@
       <div class="module_selection">
         <h3 class="title">Modules</h3>
         <div class="module_cards"  v-for="(name,index) in uniqueNames" :key="name">
-          <div :style="{'background-color': module_names[index].colour }">
+          <div :style="{'background-color': modules[index].colour }">
             {{ name }}
-            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': module_names[index].colour }" @click="selectNote(this.n)"> {{ n.title }} </div>
+            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': modules[index].colour }" @click="selectNote(this.n)"> {{ n.title }} </div>
            </div>
         </div>
       </div>
       <div class="note_taking">
-        <textarea class="text" placeholder="Start typing here..." v-model="note.text"></textarea>
+        <button class="btn btn-primary m-3 btn_one options">U</button>
+        <button class="btn btn-primary m-3 btn_two options">I</button>
+        <button class="btn btn-primary m-3 btn_three options">B</button>
+        <input ref="font_color" type="color" class="input_color options"/><br>
+        <textarea class="text" placeholder="Start typing here..." v-model="note.text" @click="toggleColor"></textarea>
       </div>
     </div>
   </div>
@@ -59,24 +63,24 @@ export default {
   data() {
     return {
       uniqueNames: [],
-      module_names:[],
+      modules:[],
       notes: [],
-      note:{
-        module_name: '',
+      note:{ 
+        moduleID: '',
         text: '',
         title: '',
-        date_created: '',
+        date: '',
       },
       dialogBoxShow: false,
     };
   },
+  watch:{
+    
+  },
   computed: {
-    currentDate(){
-      return new Date();
-    },
     notePreview(){
       return this.note.text.length > 200 ? this.note.text.substring(0,200) + "..." : this.note.text;
-    }
+    },
   },
 
   methods: {
@@ -92,25 +96,24 @@ export default {
       await this.getModules();   
       this.neatify();
     },
-
+    
     async sendNote(){
-      if (!this.note.module_name) return alert("please add a module name!");
+      console.log(this.modules)
+      console.log(this.note)
+      if (!this.note.moduleID) return alert("please add a module name!");
       if (!this.note.text) return alert("please add some text!");
       if (!this.note.title) return alert("please give the note a title!");
       if (this.note.text.length > 3000) return alert("please ensure the note is under 3000 characters...");
 
-      const date = new Date();
       const newnote = {
-        module_name: this.note.module_name,
+        modID: this.note.moduleID,
         text: this.note.text,
         title: this.note.title,
-        date_created: date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate(),
+        date: this.note.date,
       }
 
-      const functions = getFunctions(app, 'europe-west2');
-      const postNote = httpsCallable(functions, 'postNote');
-      await postNote(newnote).then(() => {
-        // console.log(result);
+      await this.$store.dispatch('addNote', newnote).then((result) => {
+        console.log(result);
         this.getNotes();
         this.closeDialogBox();
       }).catch((error) => {
@@ -125,7 +128,7 @@ export default {
 			const functions = getFunctions(app, 'europe-west2');
 			const getModules = httpsCallable(functions, 'getModules')
 			await getModules().then((result) => {
-				this.module_names = result.data.data;
+				this.modules = result.data.data;
 			})
 		},
     
@@ -142,32 +145,45 @@ export default {
 
     resetInputs(){
       this.note = {
-        module_name: '',
+        modules: '',
         text: '',
         title: '',
-        date_created: '',
+        date: '',
       }
     },
 
     neatify(){
-      let unique = [...new Set(this.notes.map(item => item.module_name))]; // [ 'A', 'B']
-      this.uniqueNames = unique;
+      // // let unique = [...new Set(this.notes.map(item => item.moduleID))]; // [ 'A', 'B']
+      // // this.uniqueNames = unique;
 
-      const groupBy = function(xs, key) {
-        return xs.reduce(function(rv, x) {
-        (rv[x[key]] = rv[x[key]] || []).push(x);
-        return rv;
-        }, {});
-      };
-      let obj = groupBy(this.notes, 'module_name');
-      let newArr = [];
+      // const groupBy = function(xs, key) {
+      //   return xs.reduce(function(rv, x) {
+      //   (rv[x[key]] = rv[x[key]] || []).push(x);
+      //   return rv;
+      //   }, {});
+      // };
+      // let obj = groupBy(this.notes, 'moduleID');
+      // let newArr = [];
 
-      Object.keys(obj).forEach(key => {
-        newArr.push(obj[key]);
-      });    
+      // Object.keys(obj).forEach(key => {
+      //   newArr.push(obj[key]);
+      // });    
 
-      this.notes = newArr;
+      // this.notes = newArr;
     },
+    // toggleBold(){
+    //   document.execCommand('bold');
+    // },
+    // toggleUnderline(){
+    //   this.execCommand("underline");
+    // },
+    // toggleItalic(){
+    //   this.execCommand("italic");
+    // },
+    // toggleColor(){
+    //   this.execCommand("forecolor", false, this.$refs["font_color"]);
+    //   console.log( this.$refs["font_color"]);
+    // }
   },  
 
   
@@ -184,9 +200,7 @@ body {
   text-align-last: center;
 }
 
-.dialog_content_wrapper {
-  text-align: left;
-}
+
 
 .module_cards {
   padding: 1em;
@@ -212,10 +226,11 @@ body {
 }
 
 .module_selection{
-  width: 20em;
+  width: 20vw;
   height: 80vh;
+  border-right-style: solid;
   border-right-width: 2px;
-  border-right-color: var(--accent-colour);
+  border-right-color: var(--accent-one);
 }
 
 .title{
@@ -223,19 +238,54 @@ body {
   margin-left: 1rem;
 }
 
+.dialog_content_wrapper label {
+  margin:10px;
+}
+
+.dialog_content_wrapper input {
+  margin-left: 20px;
+}
+
 .note_taking{
-  border-left-style: solid;
-  border-left-width: 2px;
-  border-left-color: var(--main-colour);
+  border-top: 2px solid var(--accent-one);
+  width: 70vw;
+  height: 80vh;
+} 
+
+.options{
+  top: 8rem;
+  height: 39px;
+  width: 40px;
+  position: absolute;
+}
+
+.btn_one{
+  right: 4rem;
+}
+
+.btn_two{
+  right: 7rem;
+}
+
+.btn_three{
+  right: 10rem;
+}
+
+.input_color{
+  margin-top: 1rem;
+  border-radius: 5px;
+  right: 2rem;
+  padding: 0 0 0;
 }
 
 .text {
-  column-span: 4;
-  width: 80em;
+  border: 0px;
+  margin-top: 2rem;
+  width: 65vw;
   height: 80vh;
+  column-span: 4;
   resize: none;
-  border: 0em;
-  padding: 2vh 3vw;
+  padding: 1vh 3vw;
   outline: none;
 }
 </style>

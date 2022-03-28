@@ -117,13 +117,27 @@ export default {
     const functions = getFunctions(app, 'europe-west2');
     const getTimeslots = httpsCallable(functions, 'getTimeslots');
     await getTimeslots().then((result) => {
-      console.log("###############HERE~~~~~~~~")
-      console.log(result)
-      console.log("###############HERE~~~~~~~~")
       context.commit('setTimeSlots', result.data.data);
     })
   },
 
-
+  async addNote(context, payload) {
+    const addNote = httpsCallable(functions, "addNote");
+    const id = uniqid();
+    await addNote({
+      moduleID: payload.modID,
+      noteID: id,
+      title: payload.title,
+      date: payload.date,
+      text: payload.text,
+    }).then((result) => {
+        // Read result of the Cloud Function.
+        // /** @type {any} */
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
 
 }

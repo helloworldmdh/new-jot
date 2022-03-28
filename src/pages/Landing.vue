@@ -50,6 +50,13 @@ export default {
   box-shadow: 0px 2px 10px rgb(151, 151, 151);
 }
 
+.logo{
+  position: fixed;
+  left: 2rem;
+  height:5rem;
+  width: 5rem;
+}
+
 .link {
   color: white;
   position: fixed;
@@ -62,13 +69,6 @@ export default {
 
 .link:hover {
   text-decoration: underline;
-}
-
-.logo{
-  position: fixed;
-  left: 2rem;
-  height:5rem;
-  width: 5rem;
 }
 
 .app_name {

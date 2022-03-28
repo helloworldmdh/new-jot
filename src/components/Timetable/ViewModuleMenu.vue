@@ -1,5 +1,5 @@
 <template>
-  <base-dialog title="Selected Timeslot" @close="edit">
+  <base-dialog title="Selected Timeslot" @close="editing = false">
     <div class="dialog_container">
       <div class="detail_labels">
         <div class="time_d">Title</div>

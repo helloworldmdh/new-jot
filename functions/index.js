@@ -189,13 +189,13 @@ exports.getNotes = functions.region('europe-west2').https.onCall((data, context)
           const moduleDocuments = modulesQuerySnap.docs.map((doc) => ({ id: doc.id }));
 
           for (const moduleDocument of moduleDocuments) {
-            const timeslotsRef = modulesRef.doc(moduleDocument.id).collection('notes');
-            const timeslotsQuery = timeslotsRef.where('length', '!=', -1);
-            const timeslotsQuerySnap = await timeslotsQuery.get();
-            const timeslotDocuments = timeslotsQuerySnap.docs.map((doc) => ({ id: doc.id, data: doc.data() })); 
+            const notesRef = modulesRef.doc(moduleDocument.id).collection('notes');
+            const notesQuery = notesRef.where('title', '!=', '');
+            const notesQuerySnap = await notesQuery.get();
+            const notesDocuments = notesQuerySnap.docs.map((doc) => ({ id: doc.id, data: doc.data() })); 
 
-              for (const timeslotDocument of timeslotDocuments) {
-                array.push(Object.assign(timeslotDocument.data, {id: timeslotDocument.id, modID: moduleDocument.id}))
+              for (const notesDocument of notesDocuments) {
+                array.push(Object.assign(notesDocument.data, {id: notesDocument.id, modID: moduleDocument.id}))
               }
           }
           return ({ data: array });

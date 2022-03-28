@@ -1,7 +1,7 @@
 <template>
  <div class="sidebar" :style="{ width: sidebarWidth }"> <!--binded style based on sidebarCollapsed-->
    <span class="arrow" @click="toggleSidebar" :class="{'flip': !sidebarCollapsed}">  <!--toggles sidebar && flips icon when clicked-->
-      <box-icon name='chevron-right' size='lg' color='white' /> <!--flips icon if sidebar expanded-->
+      <box-icon name='chevron-right' size='cssSize' color='white' /> <!--flips icon if sidebar expanded-->
   </span>
 
      <h1>
@@ -10,12 +10,12 @@
       <div class="divider" :style="{ width: sidebarWidth }"></div>
       <transition name="fade_icon">
       <div v-if = "!sidebarCollapsed">
-      <SidebarLink id="icon-style" to="/timetable"><box-icon name='calendar' size='lg' color='white' /><span class="link_name">Timetable</span></SidebarLink>
-      <SidebarLink id="icon-style" to="/timer"> <box-icon name='time-five' size='lg' color='white' /><span class="link_name">Timer</span></SidebarLink>
-      <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='lg' color='white' /><span class="link_name">Notes</span></SidebarLink>
-      <SidebarLink id="icon-style" to="/settings"><box-icon name='cog' size='lg' color='white' /><span class="link_name">Settings</span></SidebarLink>
+      <SidebarLink id="icon-style" to="/timetable"><box-icon name='calendar' size='cssSize' color='white' /><span class="link_name">Timetable</span></SidebarLink>
+      <SidebarLink id="icon-style" to="/timer"> <box-icon name='time-five' size='cssSize' color='white' /><span class="link_name">Timer</span></SidebarLink>
+      <SidebarLink id="icon-style" to="/notes"><box-icon name='notepad' size='cssSize' color='white' /><span class="link_name">Notes</span></SidebarLink>
+      <SidebarLink id="icon-style" to="/settings"><box-icon name='cog' size='cssSize' color='white' /><span class="link_name">Settings</span></SidebarLink>
 
-      <SidebarLink id="bottom-icon" to="/" @click="logout"><box-icon name='log-out-circle' size='lg' color='white' /><span class="link_name_logout">Logout</span></SidebarLink>
+      <SidebarLink id="bottom-icon" to="/" @click="logout"><box-icon name='log-out-circle' size='cssSize' color='white' /><span class="link_name_logout">Logout</span></SidebarLink>
       </div>
      </transition>
      </span>
@@ -74,12 +74,12 @@ export default {
   font-size: var(--h1-font-size);
   text-align: center;
   margin-left: -4px;
-  margin-top: 0.8em;
+  margin-top: 0.5em;
 }
 
 img {
-  width: 150px;
-  height: 150px;
+  width: 100px;
+  height: 100px;
 }
 
 .fade-enter-active,
@@ -144,7 +144,10 @@ img {
     text-shadow: 2px 2px #7e7caf;
 }
 
+
+
 #icon-style{
+  font-size: 40px;
   margin-bottom: 1.2em;
   text-decoration: none;
 }

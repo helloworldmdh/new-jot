@@ -1,6 +1,7 @@
 <template>
   <div class="main_about">
     <div class="header">
+      <img class="logo" src="../assets/img/logo.png"/>
       <h1 class="about_main-title">About the App</h1>
     </div>
     <div class="about_body">
@@ -16,7 +17,7 @@
       </div>
 
       <div class="about_description bottom">
-        <div class="bottom">Join now to ease your life as a student!</div>
+        <div class="bottom">Join now and make your life as a student easier!</div>
         <base-button :to="$store.getters.isSignedIn ?  '/timetable' : '/login'" class="login_button"><div id="login-text">{{ $store.getters.isSignedIn ? "Go to Timetable" : "Sign Up"}}</div></base-button
         >
       </div>
@@ -50,7 +51,7 @@ export default {
           list: [
             "Optimised for the Pomodoro Method",
             "Simple Use",
-            "Track Progress by looking at the time spent studying in the past 30 days",
+            "Track Progress by looking at the time spent studying",
           ],
         },
         {
@@ -84,13 +85,21 @@ export default {
 .header {
   background-color: var(--accent-one);
   color: white;
-  padding-top: 1.5rem;
   height: 5rem;
   width: 100%;
   box-shadow: 0px 2px 10px rgb(151, 151, 151);
 }
 
+.logo{
+  padding-top: 0em;
+  position: fixed;
+  left: 1rem;
+  height:5rem;
+  width: 5rem;
+}
+
 .about_main-title {
+  padding-top: 1rem;
   font-size: 36px;
 }
 

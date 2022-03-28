@@ -1,6 +1,7 @@
 <template>
   <div class="login-body">
     <div class="header">
+      <img class="logo" src="../assets/img/logo.png"/>
       <router-link to="/aboutus" class="link">About the App</router-link>
     </div>
     <div class="page-form">
@@ -133,11 +134,16 @@ export default {
           });
         })
         .catch((error) => {
+          this.error = error.message;
           console.log(error.message);
         })
       } else {
         setPersistence(auth, browserSessionPersistence).then(()=> {
-          return signInWithEmailAndPassword(auth, this.email.val, this.password.val);
+          return signInWithEmailAndPassword(auth, this.email.val, this.password.val).then(()=>{
+            this.$router.replace('/timetable');
+          });
+        }).catch((error)=>{
+          this.error = error.message;
         })
          //.then((userCredential) => {
         //   // var user = userCredential.user;
@@ -179,6 +185,13 @@ export default {
   width: 100%;
   background-color: var(--accent-one);
   box-shadow: 0px 2px 10px rgb(151, 151, 151);
+}
+
+.logo{
+  position: fixed;
+  left: 2rem;
+  height:5rem;
+  width: 5rem;
 }
 
 .link {

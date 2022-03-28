@@ -1,7 +1,7 @@
 <template>
 <TheSidebar v-if="page"/>  <!--sidebar component-->
  <div :style="{ marginLeft: computedLeftMargin}" class="router_view">
-  <router-view></router-view>
+  <router-view></router-view> 
  </div>
 </template>
 
@@ -61,4 +61,5 @@ export default {
 [v-cloak] {
   display: none;
 }
+
 </style>

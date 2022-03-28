@@ -20,7 +20,8 @@
           type="text"
           class="input_box_modname"
           v-model.trim="modName"
-          list="modnames required"
+          list="modnames"
+          required
         />
         <datalist id="modnames">
           <option v-for="mod in existingModules" :key="mod">
@@ -123,15 +124,16 @@ export default {
     modName(name) {
       //if (name == "") this.valid.module = "invalid";
       if (this.existingModules) {
-        if (this.existingModules.find((mod) => mod.name == name)) {
+        const mod = this.existingModules.find((mod) => mod.name == name);
+        if (mod) {
           this.colourDisabled = true;
+          this.newModule.colour = mod.colour
         } else {
           this.colourDisabled = false;
         }
       }
       this.newModule.name = name;
       this.newTimeSlot.mod = name;
-      console.log(name)
     },
   },
   async mounted() {
@@ -139,6 +141,8 @@ export default {
     let temp = this.$store.getters.getterModules;
     if (!temp) this.existingModules = [];
     else this.existingModules = temp;
+    console.log("HERE YOO")
+    console.log(this.existingModules)
   },
   methods: {
     close() {

@@ -37,6 +37,7 @@
 <script>
 import app from "../api/firebase";
 import { getAuth } from "firebase/auth";
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 export default {
   mounted() {
@@ -60,8 +61,10 @@ export default {
     this.timeStudied = this.$store.getters.getterTotalTime;
   },
   methods: {
-    deleteAccount() {
-      console.log("deleted account");
+    async deleteAccount() {
+      const functions = getFunctions(app);
+      const deleteUserInfo = httpsCallable(functions, 'deleteUserInfo');
+      await deleteUserInfo();
     },
     toggleWarning() {
       this.warning = !this.warning;
