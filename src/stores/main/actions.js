@@ -24,6 +24,8 @@ export default {
   async getModulesFromServer(context) {
     const getModules = httpsCallable(functions, 'getModules')
     await getModules().then((result) => {
+      console.log("from getModulesFromServer");
+      console.log(result.data.data);
       context.commit('setModules', result.data.data);
     }).catch((error) => {
       console.log(error);
@@ -62,19 +64,66 @@ export default {
     const addTimeslot = httpsCallable(functions, 'addTimeslot');
     const id = uniqid();
     await addTimeslot({
-      moduleName: payload.mod,
+      moduleID: payload.moduleID,
       timeslotID: id,
       title: payload.title,
       startTime: payload.startTime,
       length: payload.length,
       day: payload.day,
-      }).then((result) => {
+    }).then((result) => {
       // Read result of the Cloud Function.
       // /** @type {any} */
       console.log(result);
-      this.close();
     }).catch((error) => {
       console.log(error);
     });
   },
+
+  async addModule(context, payload) {
+    const addModule = httpsCallable(functions, "addModule");
+    const id = uniqid();
+    await addModule({
+      moduleID: id,
+      moduleName: payload.moduleName,
+      colour: payload.colour,
+      lecturer: payload.lecturer,
+    }).then((result) => {
+        // Read result of the Cloud Function.
+        // /** @type {any} */
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+  
+  //async editTimeSlot(){
+  // const updateTimeslot = httpsCallable(functions, "updateTimeslot");
+  // await updateTimeslot({
+  //   moduleID: payload.moduleID,
+  //   timeslotID: payload.timeslotID,
+  //   title: payload.title,
+  //   startTime: payload.startTime,
+  //   length: payload.length,
+  //   day: payload.day,
+  // }).then((result) => {
+  //     console.log(result);
+  // }).catch((error) => {
+  //   console.log(error);
+  // });
+  // }
+
+  async getTimeSlots(context){
+    const functions = getFunctions(app, 'europe-west2');
+    const getTimeslots = httpsCallable(functions, 'getTimeslots');
+    await getTimeslots().then((result) => {
+      console.log("###############HERE~~~~~~~~")
+      console.log(result)
+      console.log("###############HERE~~~~~~~~")
+      context.commit('setTimeSlots', result.data.data);
+    })
+  },
+
+
+
 }

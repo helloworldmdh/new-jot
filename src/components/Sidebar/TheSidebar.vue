@@ -6,7 +6,7 @@
 
      <h1>
      <span v-show="!sidebarCollapsed">
-     <transition name="fade"> <h1 class="title" v-if="!sidebarCollapsed">NewJot<br></h1> </transition>   <!--title when sidebar expands-->
+     <transition name="fade"> <h1 class="title" v-if="!sidebarCollapsed"><img src="../../assets/img/logo.png"/></h1> </transition>   <!--title when sidebar expands-->
       <div class="divider" :style="{ width: sidebarWidth }"></div>
       <transition name="fade_icon">
       <div v-if = "!sidebarCollapsed">
@@ -72,17 +72,21 @@ export default {
 .title{
   color: whitesmoke;
   font-size: var(--h1-font-size);
-  width: 0px;
   text-align: center;
-  margin-left: -7px;
-  margin-bottom: .75em;
-  margin-top: 1.5em;
+  margin-left: -4px;
+  margin-top: 0.8em;
+}
+
+img {
+  width: 150px;
+  height: 150px;
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 1s ease;
 }
+
 
 .fade-enter-from,
 .fade-leave-to {
@@ -100,7 +104,7 @@ export default {
 }
 
 .divider{
-  margin-left: -7px;
+  margin-left: -9px;
   height: .01rem;
   background-color: azure;
   width: 0px;

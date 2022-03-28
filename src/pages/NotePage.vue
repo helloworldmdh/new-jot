@@ -220,6 +220,13 @@ body {
 
 .title{
   text-align: left;
+  margin-left: 1rem;
+}
+
+.note_taking{
+  border-left-style: solid;
+  border-left-width: 2px;
+  border-left-color: var(--main-colour);
 }
 
 .text {

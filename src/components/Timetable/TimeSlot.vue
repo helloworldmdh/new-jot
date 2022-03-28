@@ -125,10 +125,9 @@ export default {
         margin-left: 1em;
         padding-left: 1em;
         height: 3em;
-        border-radius: 0.35em;
-        border-color: #e7b1a0;
-        border-width: 2px;
-        border-style: solid;
+        border-bottom-color: #9c9c9c;
+        border-bottom-width: 2px;
+        border-bottom-style: solid;
         font-size: 15px;
         position: absolute;
         width:98%;

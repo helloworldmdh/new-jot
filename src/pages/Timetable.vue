@@ -2,7 +2,7 @@
   <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTableAndClose"></add-module-menu>
   <a class="floating-btn" @click="openBox">+</a>
   <view-module-menu :show="slotSelect" @close="unselect" 
-    :title="selected.title"
+    :slot_title="selected.title"
     :mod_name="selected.mod"
     :sTime="selected.startTime"
     :day="selected.day"
@@ -36,10 +36,8 @@
 </template>
 
 <script>
-import app from "../api/firebase"
 import TimeSlot from "../components/Timetable/TimeSlot.vue";
 import AddModuleMenu from "../components/Timetable/AddModuleMenu.vue";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import ViewModuleMenu from '../components/Timetable/ViewModuleMenu.vue';
 
 
@@ -71,8 +69,7 @@ export default {
     },
 
     async updateTable(){
-      
-      await this.getTimeSlots()
+      await this.$store.dispatch('getTimeSlots');
       let temp = this.$store.getters.getterTimeSlots;
       if (temp) this.baseTimeSlots = []
       await this.$store.dispatch('getModulesFromServer');
@@ -97,18 +94,7 @@ export default {
       })
     },
 
-    async getTimeSlots(){
-      const functions = getFunctions(app, 'europe-west2');
-			const getTimeslots = httpsCallable(functions, 'getTimeslots');
-			await getTimeslots().then((result) => {
-        if (!result.data.data) {
-          this.openBox()
-          this.baseTimeSlots = []
-        } else {
-          this.baseTimeSlots = result.data.data;
-        }
-			})
-    },
+    
     
 
     checkOverlap(){

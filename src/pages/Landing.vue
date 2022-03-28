@@ -1,6 +1,7 @@
 <template>
   <div class="landing_body">
     <div class="header">
+      <img class="logo" src="../assets/img/logo.png"/>
       <router-link to="/aboutus" class="link">About the App</router-link>
     </div>
     <div class="main">
@@ -61,6 +62,13 @@ export default {
 
 .link:hover {
   text-decoration: underline;
+}
+
+.logo{
+  position: fixed;
+  left: 2rem;
+  height:5rem;
+  width: 5rem;
 }
 
 .app_name {

@@ -8,12 +8,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@vue/cli": "^5.0.4",
     "boxicons": "^2.1.1",
     "core-js": "^3.6.5",
     "firebase": "^9.6.8",
     "uniqid": "^5.4.0",
     "vue": "^3.2.31",
-    "vue-cli": "^2.9.6",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2"
   },

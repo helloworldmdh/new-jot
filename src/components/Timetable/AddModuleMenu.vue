@@ -1,5 +1,5 @@
 <template>
-  <base-dialog title="Create a Timeslot" @keyup.enter="submit">
+  <base-dialog title="Create a Timeslot">
     <div class="dialog_container">
       <div class="labels">
         <div class="label_details">Title</div>
@@ -67,9 +67,6 @@
 </template>
 
 <script>
-import app from "../../api/firebase";
-import { getFunctions, httpsCallable } from "firebase/functions";
-// import { getAuth } from 'firebase/auth';
 export default {
   name: "AddModuleMenu",
   data() {
@@ -124,7 +121,7 @@ export default {
         this.newTimeSlot.startTime;
     },
     modName(name) {
-      if (name == "") this.valid.module = "invalid";
+      //if (name == "") this.valid.module = "invalid";
       if (this.existingModules) {
         if (this.existingModules.find((mod) => mod.name == name)) {
           this.colourDisabled = true;
@@ -134,11 +131,7 @@ export default {
       }
       this.newModule.name = name;
       this.newTimeSlot.mod = name;
-    },
-    valid(data) {
-      if (data.name) {
-        return;
-      }
+      console.log(name)
     },
   },
   async mounted() {
@@ -179,57 +172,44 @@ export default {
       this.validateMenu();
 
       // TODO: Verify input fields are correct before doing \/ \/ \/
-      this.getModules().then(() => {
+      this.$store.dispatch('getModulesFromServer').then(async () => {
+        const payload = {
+          moduleName: this.newModule.name,
+          colour: this.newModule.colour,
+          lecturer: this.newModule.lecturer,
+        };
+        
         if (this.existingModules) {
           var exists = !!this.existingModules.find(
             (mod) => mod.name == this.newModule.name
           );
           if (!exists) {
-            this.addModule();
+            await this.$store.dispatch('addModule', payload);
           }
         } else {
-          this.addModule();
+          await this.$store.dispatch('addModule', payload);
         }
 
-        this.addSlot().then(() => {
+        this.$store.dispatch('getModulesFromServer').then(() => {
           const payload = {
-            moduleName: this.newTimeSlot.mod,
+            moduleID: this.$store.getters.getterModules.find((mod) => mod.name == this.newTimeSlot.mod).id,
             title: this.newTimeSlot.title,
             startTime: this.newTimeSlot.startTime,
             length: this.newTimeSlot.length,
             day: this.newTimeSlot.day,
           };
-          this.$store.dispatch("addSlot", payload);
-          this.close();
-          this.clearMenu();
+          
+          this.$store.dispatch("addSlot", payload).then(() => {
+            this.close();
+            this.clearMenu();
+          });
         });
-      });
-    },
-    async getModules() {
-      const functions = getFunctions(app, "europe-west2");
-      const getModules = httpsCallable(functions, "getModules");
-      await getModules().then((result) => {
-        this.existingModules = result.data.data;
+
       });
     },
 
-    addModule() {
-      const functions = getFunctions(app, "europe-west2");
-      const addModule = httpsCallable(functions, "addModule");
-      addModule({
-        moduleName: this.newModule.name,
-        colour: this.newModule.colour,
-        lecturer: this.newModule.lecturer,
-      })
-        .then((result) => {
-          // Read result of the Cloud Function.
-          // /** @type {any} */
-          console.log(result);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
+
+    
   },
 };
 </script>
