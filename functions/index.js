@@ -143,34 +143,71 @@ exports.authDelete = functions.region('europe-west2').auth.user().onDelete((user
   return admin.firestore().collection('users').doc(user.uid).delete();
 });
 
-exports.postNote = functions.region('europe-west2').https.onCall((data, context) => {
-  const uid = context.auth.uid;
-  if (!uid) {
-    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
-  } else {
-    return admin.firestore().collection('Notes').doc(uid).update({
-      notes: admin.firestore.FieldValue.arrayUnion(data),
-    }).then(() => {
-      return ({ data: 'Saved note in database' });
-    });
-  }
-});
 
-exports.getNotes = functions.region('europe-west2').https.onCall((_, context) => {
+
+exports.addNote = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-    return admin.firestore().collection('Notes').doc(uid).get().then(doc => {
-      if (!doc.exists) {
-        console.log('No matching documents.');
-        return ({ data: 'No user data in database' });
-      }
-      // console.log(snapshot)
-      // 2. Send data back to client
-      return ({ data: doc.data().notes});
+    return admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleID).collection('notes').doc(data.noteID).set({
+      title: data.title,
+      date: data.date,
+      text: data.text,
+    }).then(() => {
+      return ({ data: "Saved Notes to Database" });
     });
 });
+
+// exports.getNotes = functions.region('europe-west2').https.onCall((_, context) => {
+//   const uid = context.auth.uid;
+//   if (!uid)
+//     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+//   else
+//     return admin.firestore().collection('Notes').doc(uid).get().then(doc => {
+//       if (!doc.exists) {
+//         console.log('No matching documents.');
+//         return ({ data: 'No user data in database' });
+//       }
+//       // console.log(snapshot)
+//       // 2. Send data back to client
+//       return ({ data: doc.data().notes});
+//     });
+// });
+
+exports.getNotes = functions.region('europe-west2').https.onCall((data, context) => {  
+  const getData = async () => {
+      const uid = context.auth.uid;
+      let array = [];
+
+      if (!uid) {
+          throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+      } else {
+          const modulesRef = db.collection('users').doc(uid).collection('modules');
+          const modulesQuery = modulesRef.where('name', '!=', '');
+          const modulesQuerySnap = await modulesQuery.get();
+          const moduleDocuments = modulesQuerySnap.docs.map((doc) => ({ id: doc.id }));
+
+          for (const moduleDocument of moduleDocuments) {
+            const timeslotsRef = modulesRef.doc(moduleDocument.id).collection('notes');
+            const timeslotsQuery = timeslotsRef.where('length', '!=', -1);
+            const timeslotsQuerySnap = await timeslotsQuery.get();
+            const timeslotDocuments = timeslotsQuerySnap.docs.map((doc) => ({ id: doc.id, data: doc.data() })); 
+
+              for (const timeslotDocument of timeslotDocuments) {
+                array.push(Object.assign(timeslotDocument.data, {id: timeslotDocument.id, modID: moduleDocument.id}))
+              }
+          }
+          return ({ data: array });
+      }
+  }
+
+  return getData()
+  .then((response) => { 
+      // console.log(response);
+      return response;
+  });
+})
 
 exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
