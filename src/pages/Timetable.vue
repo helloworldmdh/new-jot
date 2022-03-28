@@ -71,10 +71,12 @@ export default {
     async updateTable(){
       await this.$store.dispatch('getTimeSlots');
       let temp = this.$store.getters.getterTimeSlots;
-      if (temp) this.baseTimeSlots = []
+      if (!temp) this.baseTimeSlots = []
+      else this.baseTimeSlots = temp;
       await this.$store.dispatch('getModulesFromServer');
       temp = this.$store.getters.getterModules;
-      if (temp) this.existingModules = []
+      if (!temp) this.existingModules = []
+      else this.existingModules = temp
       this.addColour();
       this.splitByDay();
       this.checkOverlap();
@@ -83,7 +85,8 @@ export default {
     addColour() {
       this.colourTimeSlots = this.baseTimeSlots;
       this.baseTimeSlots.forEach((slot, index)=> {
-          this.colourTimeSlots[index].colour = this.existingModules.find(element => element.name == slot.mod).colour
+        console.log(this.existingModules)
+          this.colourTimeSlots[index].colour = this.existingModules.find(mod => mod.id == slot.modID).colour
       })
     },
 
@@ -93,9 +96,6 @@ export default {
         this.timeSlots[timeSlot.day].push(timeSlot)
       })
     },
-
-    
-    
 
     checkOverlap(){
       this.timeSlots.forEach((day) => {
