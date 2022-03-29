@@ -2,7 +2,7 @@
   <base-dialog
     :title="slotInEdit.title"
     :colour="currSlot.colour"
-    @close="editing = false"
+    @close="close"
   >
     <div class="dialog_container">
       <div class="detail_labels">
@@ -102,7 +102,7 @@ export default {
       ],
     }; 
   },
-  emits: ['deleteSlot'],
+  emits: ['deleteSlot', 'closeModuleMenu'],
   computed: {
     formatTime() {
       let fulltime = "";
@@ -177,9 +177,6 @@ export default {
           //add new timeslot in new module
           this.moduleInEdit.id = this.temp_module.find( mod => mod.name == this.moduleInEdit.name).id;
           //do not change colour or lecturer
-      } else {
-        // allow the user to change the colour or lecture here
-        this.$store.dispatch("addModule", this.moduleInEdit);
       }
       
       console.log(this.currModule, this.moduleInEdit);
@@ -196,6 +193,7 @@ export default {
       
       this.$store.dispatch("addSlot", newSlot).then(() => {
         this.edit();
+        this.close();
       });
     },
     async deleteSlot(){
@@ -205,7 +203,9 @@ export default {
       });
       this.close();
     },
-    close(){
+    close() {
+      this.$emit('closeModuleMenu');
+      this.editing = false;
       this.slotSelect = false;
     }
   },
@@ -213,26 +213,13 @@ export default {
     selected(){
       const temp_modules = this.$store.getters.getterModules;
       this.temp_module = temp_modules;
-
-
-      this.slotInEdit.title = this.currSlot.title;
-      this.slotInEdit.day = this.currSlot.day;
-      this.slotInEdit.length = this.currSlot.length;
-      this.slotInEdit.colour = this.currSlot.colour;
-      this.slotInEdit.id = this.currSlot.id;
-      this.slotInEdit.startTime = this.currSlot.startTime;
-      this.slotInEdit.modID = this.currSlot.modID;
-
-
+      this.slotInEdit = JSON.parse(JSON.stringify(this.currSlot));
 
       console.log(this.slotInEdit,"Slot")
       console.log(this.currSlot,"Differ");
       if (temp_modules.length != 0) {
         this.currModule = temp_modules.find( mod => mod.id == this.currSlot.modID);
-        this.moduleInEdit.name = this.currModule.name;
-        this.moduleInEdit.lecturer = this.currModule.lecturer;
-        this.moduleInEdit.id = this.currModule.id;
-        this.moduleInEdit.colour = this.currModule.colour;
+        this.moduleInEdit = JSON.parse(JSON.stringify(this.currModule))
       }
       this.startTimeString = this.convertTime(this.currSlot.startTime);
       this.endTimeString = this.convertTime(this.currSlot.startTime+this.currSlot.length);

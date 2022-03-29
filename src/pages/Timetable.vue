@@ -2,7 +2,7 @@
 <div id="main_container">
   <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTableAndClose"></add-module-menu>
   <a class="floating-btn" @click="openBox">+</a>
-  <view-module-menu :show="slotSelect" @close="unselect" 
+  <view-module-menu :show="slotSelect" @closeModuleMenu="unselect" 
     :selected="slotSelect"
     :currSlot="selectedSlot"
   />
@@ -134,6 +134,7 @@ export default {
       this.slotSelect = true;
     },
     unselect(){
+      console.log("unselect has been called!");
       this.slotSelect = false;
       this.updateTable();
     },
