@@ -177,14 +177,37 @@ exports.getNotes = functions.region('europe-west2').https.onCall((data, context)
   });
 })
 
+exports.deleteTimeslot = functions.region('europe-west2').https.onCall((data, context) => {
+  const uid = context.auth.uid;
+  if (!uid)
+    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+  else
+    return admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleID).collection('timeslots').doc(data.timeslotID).delete().then(() => {
+      return ({data: 'Document successfully deleted!'});
+    });
+});
+
+exports.deleteModule = functions.region('europe-west2').https.onCall((data, context) => {
+  const uid = context.auth.uid;
+  if (!uid)
+    throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
+  else
+    return admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleID).delete().then(() => {
+      return ({data: 'Document successfully deleted!'});
+    });
+});
+
+
 exports.deleteNote = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-    admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleID).collection('notes').doc(data.noteID).delete().then(() => {
+    return admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleID).collection('notes').doc(data.noteID).delete().then(() => {
       return ({data: 'Document successfully deleted!'});
-    });
+    }).catch((error) => {
+      console.log(error);
+    })
 });
 
 exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, context) => {
@@ -192,7 +215,7 @@ exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, co
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
   else
-     admin.firestore().collection("users").doc(uid).delete().then(function () {
+     return admin.firestore().collection("users").doc(uid).delete().then(function () {
         return ({ data: "Document successfully deleted!"});
      })
 });

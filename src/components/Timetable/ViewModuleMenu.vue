@@ -1,6 +1,6 @@
 <template>
   <base-dialog
-    title="Selected Timeslot"
+    :title="slotInEdit.title"
     :colour="currSlot.colour"
     @close="editing = false"
   >
@@ -16,10 +16,11 @@
         <div class="time_i">{{ currSlot.title }}</div>
         <div class="time_i">{{ currModule.name }}</div>
         <div class="time_i">{{ formatTime }}</div>
-        <div class="time_i">{{ changeDay }}</div>
+        <div class="time_i">{{ changeDay(currSlot.day) }}</div>
         <div class="time_i">{{ currModule.lecturer }}</div>
+        <box-icon class="delete_style" name='trash' size="md" :color="computedAccentColour" animation="tada-hover" @click="deleteSlot"></box-icon>
       </div>
-      <div class="mod_inputs" v-else>
+      <div class="mod_inputs" v-else-if="editing">
         <div class="mod_inputs">
           <input
             type="text"
@@ -27,20 +28,14 @@
             v-model.trim="slotInEdit.title"
             required
           /><br />
-
-          <input
-            type="text"
-            class="input_box_modname"
-            v-model="moduleInEdit.name"
-            required
-          />
-          <datalist id="modnames">
-            <option v-for="mod in temp_module" :key="mod">{{ mod.name }}</option>
-          </datalist>
+          <select class="input_box_modname" v-model="moduleInEdit.name" id="modnames">
+            <option v-for="mod in temp_module" :key="mod" :value="mod.name">{{ mod.name }}</option>
+          </select>
           <input
             type="color"
             class="input_box_color"
-            v-model="slotInEdit.colour"
+            v-model="moduleInEdit.colour"
+            disabled
           /><br />
           <input
             type="time"
@@ -55,23 +50,24 @@
             v-model="endTimeString"
             required
           /><br />
-          <select class="input_box" :v-model="slotInEdit.day" required>
-            <option v-for="d in days" :key="d">
+          <select class="input_box" v-model="slotInEdit.day" required>
+            <option v-for="(d, index) in days" :key="d" :value="index" :selected="d == changeDay(slotInEdit.day)">
               {{ d }}
-            </option></select
+            </option>
+            </select
           ><br />
           <input
             type="text"
             class="input_box"
             v-model.trim="moduleInEdit.lecturer"
-            required
+            required disabled
           /><br />
         </div>
       </div>
     </div>
 
     <template #actions v-if="!editing">
-      <button class="btn btn-primary m-3" @click="edit">Edit</button>
+      <box-icon class="icon_style" name='pencil' size="md" :color="computedAccentColour" animation="tada-hover" @click="edit"></box-icon>
     </template>
     <template #actions v-else>
       <button class="btn btn-primary m-3" @click="edit">Cancel</button>
@@ -88,13 +84,10 @@ export default {
       editing: false,
       startTimeString: "",
       endTimeString: "",
+      
       slotInEdit: {
-        title: "",
-        module: "",
-        colour: "",
       },
       currModule: {
-        
       },
       moduleInEdit: {},
       tempModule: [],
@@ -107,12 +100,31 @@ export default {
         "Saturday",
         "Sunday",
       ],
-    };
+    }; 
   },
+  emits: ['deleteSlot'],
   computed: {
-    changeDay() {
+    formatTime() {
+      let fulltime = "";
+      let startTime = this.convertTime(this.currSlot.startTime);
+      let endTime = this.convertTime(this.currSlot.startTime + this.currSlot.length);
+      fulltime = startTime + " - " + endTime;
+      return fulltime;
+    },
+    computedAccentColour() {
+      // Counting the perceptive luminance - human eye favors green color...
+      if (this.currSlot.colour.length != 7) return "#646464"
+      var luminance = (0.299 * this.hexToRgb(this.currSlot.colour).r + 0.587 * this.hexToRgb(this.currSlot.colour).g + 0.114 * this.hexToRgb(this.currSlot.colour).b)/255;
+      if (luminance < 0.5)
+        return "#ffffff"
+      else
+        return "#000000"
+    },
+  },
+  methods: {
+    changeDay(d) {
       var day_name = "";
-      switch (this.slotInEdit.day) {
+      switch (d) {
         case 0:
           day_name = "Monday";
           break;
@@ -137,15 +149,6 @@ export default {
       }
       return day_name;
     },
-    formatTime() {
-      let fulltime = "";
-      let startTime = this.convertTime(this.currSlot.startTime);
-      let endTime = this.convertTime(this.currSlot.startTime + this.currSlot.length);
-      fulltime = startTime + " - " + endTime;
-      return fulltime;
-    },
-  },
-  methods: {
     convertTime(mins) {
       let h = Math.floor(mins / 60);
       let m = mins % 60;
@@ -156,53 +159,104 @@ export default {
     edit() {
       this.editing = !this.editing;
     },
+    hexToRgb(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    },
     async updateSlot(){ //Object.is(ob1, ob2) -> true if equal, false if not
       console.log("I am being called! YAYAYYAYAYAY");
-      if (this.currModule !== this.moduleInEdit){
-        await this.$store.dispatch('addModule', this.moduleInEdit);
+      //await this.$store.dispatch('addModule', this.moduleInEdit);
+      if (this.moduleInEdit.name != this.currModule.name){
+          //delete old timeslot in old module
+          this.deleteSlot();
+
+          //add new timeslot in new module
+          this.moduleInEdit.id = this.temp_module.find( mod => mod.name == this.moduleInEdit.name).id;
+          //do not change colour or lecturer
+      } else {
+        // allow the user to change the colour or lecture here
+        this.$store.dispatch("addModule", this.moduleInEdit);
       }
-      console.log(this.currSlot, this.slotInEdit, !Object.is(this.currSlot, this.slotInEdit), this.currSlot !== this.slotInEdit);
-      if (this.currSlot !== this.slotInEdit){
-        console.log("Not same")
-      const newSlot = {
-            moduleID: this.moduleInEdit.moduleID,
-            title: this.slotInEdit.title,
-            startTime: this.slotInEdit.startTime,
-            length: this.slotInEdit.length,
-            day: this.slotInEdit.day,
-            id: this.slotInEdit.id
-          };
       
-          this.$store.dispatch("addSlot", newSlot).then(() => {
-            this.edit();
-        });
-       }else{ 
+      console.log(this.currModule, this.moduleInEdit);
+      console.log(this.currSlot, this.slotInEdit)
+      
+      const newSlot = {
+        moduleID: this.moduleInEdit.id,
+        title: this.slotInEdit.title,
+        startTime: this.slotInEdit.startTime,
+        length: this.slotInEdit.length,
+        day: this.slotInEdit.day,
+        id: this.currSlot.id
+      };
+      
+      this.$store.dispatch("addSlot", newSlot).then(() => {
         this.edit();
-      }
+      });
+    },
+    async deleteSlot(){
+      await this.$store.dispatch('deleteTimeSlot', {
+        moduleID: this.currSlot.modID,
+        timeslotID: this.currSlot.id,
+      });
+      this.close();
+    },
+    close(){
+      this.slotSelect = false;
     }
   },
   watch: {
-    currSlot(){
+    selected(){
       const temp_modules = this.$store.getters.getterModules;
       this.temp_module = temp_modules;
-      this.slotInEdit = this.currSlot;
+
+
+      this.slotInEdit.title = this.currSlot.title;
+      this.slotInEdit.day = this.currSlot.day;
+      this.slotInEdit.length = this.currSlot.length;
+      this.slotInEdit.colour = this.currSlot.colour;
+      this.slotInEdit.id = this.currSlot.id;
+      this.slotInEdit.startTime = this.currSlot.startTime;
+      this.slotInEdit.modID = this.currSlot.modID;
+
+
+
       console.log(this.slotInEdit,"Slot")
       console.log(this.currSlot,"Differ");
       if (temp_modules.length != 0) {
         this.currModule = temp_modules.find( mod => mod.id == this.currSlot.modID);
-        this.moduleInEdit = this.currModule;
+        this.moduleInEdit.name = this.currModule.name;
+        this.moduleInEdit.lecturer = this.currModule.lecturer;
+        this.moduleInEdit.id = this.currModule.id;
+        this.moduleInEdit.colour = this.currModule.colour;
       }
       this.startTimeString = this.convertTime(this.currSlot.startTime);
       this.endTimeString = this.convertTime(this.currSlot.startTime+this.currSlot.length);
-    }
+    },
+    startTimeString(string) {
+      const splitTimeString = string.split(":");
+      this.slotInEdit.startTime =
+        +splitTimeString[0] * 60 + +splitTimeString[1];
+    },
+    endTimeString(string) {
+      const splitTimeString = string.split(":");
+      this.slotInEdit.length =
+        +splitTimeString[0] * 60 +
+        +splitTimeString[1] -
+        this.slotInEdit.startTime;
+    },
   },
   props: {
     currSlot: {
       type: Object,
     },
-    time_length: {
-      type: Number,
-    },
+    selected:{
+      type: Boolean,
+    }
   },
 };
 </script>
@@ -219,6 +273,20 @@ export default {
 }
 .mod_inputs {
   width: 20em;
+}
+
+.icon_style{
+  position: absolute;
+  width: 3rem;
+  right: 1rem;
+  top: 1rem;
+}
+
+.delete_style{
+  position: absolute;
+  width: 3rem;
+  right: 4rem;
+  top: 1rem;
 }
 
 .input_box {

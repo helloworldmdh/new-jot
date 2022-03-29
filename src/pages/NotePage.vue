@@ -136,10 +136,10 @@ export default {
     },
     
     async sendNote(){
-      if (!this.note.moduleID) return alert("please add a module name!");
-      if (!this.note.text) return alert("please add some text!");
-      if (!this.note.title) return alert("please give the note a title!");
-      if (this.note.text.length > 3000) return alert("please ensure the note is under 3000 characters...");
+      if (!this.note.moduleID) return alert("Please add a module name!");
+      if (!this.note.text) return alert("Please add some text!");
+      if (!this.note.title) return alert("Please give the note a title!");
+      if (this.note.text.length > 3000) return alert("Please ensure the note is under 3000 characters...");
 
   
 

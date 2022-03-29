@@ -141,8 +141,6 @@ export default {
     let temp = this.$store.getters.getterModules;
     if (!temp) this.existingModules = [];
     else this.existingModules = temp;
-    console.log("HERE YOO")
-    console.log(this.existingModules)
   },
   methods: {
     close() {

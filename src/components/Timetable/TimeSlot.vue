@@ -113,6 +113,9 @@ export default {
         font-size: 15px;
         position: absolute;
         width:98%;
+        border-width: 1px;
+        border-color: grey;
+        border-style: solid;
         left:-0.95em;
         overflow: hidden;
         cursor: pointer;

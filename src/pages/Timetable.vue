@@ -3,7 +3,8 @@
   <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTableAndClose"></add-module-menu>
   <a class="floating-btn" @click="openBox">+</a>
   <view-module-menu :show="slotSelect" @close="unselect" 
-    :currSlot="selected"
+    :selected="slotSelect"
+    :currSlot="selectedSlot"
   />
   <div class="timetable">
     <div class="time-column">
@@ -129,16 +130,25 @@ export default {
       this.showDialogBox = true;
     },
     selectSlot(slot){
-      this.selected = slot;
+      this.selectedSlot = slot;
       this.slotSelect = true;
     },
     unselect(){
+      this.slotSelect = false;
+      this.updateTable();
+    },
+    async deleteSlot(){
+      await this.$store.dispatch('deleteSlot', {
+        moduleID: this.selectedSlot.modID,
+        timeslotID: this.selectedSlot.id,
+      });
+      this.updateTable;
       this.slotSelect = false;
     },
   },
   data() {
     return {
-      selected:{
+      selectedSlot:{
         title: "",
         day: 0,
         startTime: 0,

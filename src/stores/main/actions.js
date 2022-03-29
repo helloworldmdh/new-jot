@@ -81,7 +81,7 @@ export default {
     const addModule = httpsCallable(functions, "addModule");
     const id = uniqid();
     await addModule({
-      moduleID: id,
+      moduleID: payload.id ? payload.id : id,
       moduleName: payload.moduleName,
       colour: payload.colour,
       lecturer: payload.lecturer,
@@ -116,6 +116,15 @@ export default {
     const getTimeslots = httpsCallable(functions, 'getTimeslots');
     await getTimeslots().then((result) => {
       context.commit('setTimeSlots', result.data.data);
+    })
+  },
+
+  async deleteTimeSlot(context, payload) {
+    const deleteNote = httpsCallable(functions, "deleteTimeslot");
+    await deleteNote(payload).then(result => {
+      console.log(result);
+    }).catch((error)=>{
+      console.log(error);
     })
   },
 

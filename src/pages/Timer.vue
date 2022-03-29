@@ -157,12 +157,12 @@ export default {
           this.studyOrRest = true;
           this.sessions--;
           if (this.sessions == 0) {
-            this.totalTime = +this.totalTime + +this.totalminutes;
+            this.totalTime += +this.totalminutes;
             this.completed = true;
             this.saveNewTime();
             this.cancelTimer();
           } else {
-            this.totalTime = +this.totalTime + +this.totalminutes;
+            this.totalTime += +this.totalminutes;
             this.saveNewTime();
             this.startBreak();
           }
@@ -183,7 +183,7 @@ export default {
       this.timerOn = true;
       this.interval = setInterval(() => {
         this.runTimer();
-      }, 10);
+      }, 1000);
     },
     pauseTimer() {
       this.timerPaused = true;
@@ -198,20 +198,25 @@ export default {
     cancelTimer() {
       console.log(this.minutes);
       clearInterval(this.interval);
-      (this.currSeconds = "00"),
-        (this.totalseconds = "00"),
-        (this.totalminutes = "00"),
-        (this.studyOrRest = false);
-      this.timerOn = false;
-      this.minutes = "00";
-      this.seconds = "00";
-      this.sessions = 3;
+      this.resetTime();
     },
     startBreak() {
       this.minutes = this.selectRest;
       this.totalseconds = this.minutes * 60;
       this.currSeconds = 0;
       this.runTimer;
+    },
+    resetTime(){
+      this.studyOrRest = false; //false == study, true == rest
+      this.timerOn = false;
+      this.timerPaused = false;
+      this.completed = false;
+      this.currSeconds = "00";
+      this.totalseconds = "00";
+      this.totalminutes = "00";
+      this.minutes = "00";
+      this.seconds = "00";
+      this.sessions = 3;
     },
     saveNewTime() {
       const functions = getFunctions(app, 'europe-west2');
