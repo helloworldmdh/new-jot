@@ -330,7 +330,7 @@ button {
   height: 60px;
   max-width: 100%;
   margin: 0 auto;
-  margin-top: 1rem;
+  margin-top: var(--normal-font-size);
   margin-bottom: 0;
   overflow: hidden;
   position: relative;

@@ -1,6 +1,6 @@
 <template>
   <base-dialog title="Create a Timeslot">
-    <div class="dialog_container">
+    <div class="dialog_container" ref="dialog_container">
       <div class="labels">
         <div class="label_details">Title</div>
         <div class="label_details">Module</div>
@@ -98,13 +98,6 @@ export default {
         "Saturday",
         "Sunday",
       ],
-      valid: {
-        title: "pending",
-        module: "pending",
-        time: "pending",
-        lecturer: "pending",
-        location: "pending",
-      },
     };
   },
   emits: ["updateTable"],
@@ -148,7 +141,10 @@ export default {
     },
 
     validateMenu() {
-
+      if (!this.modName) {
+        alert('please give a module name!');
+        return false;
+      }
     },
 
     clearMenu() {
@@ -171,10 +167,16 @@ export default {
     },
 
     submit() {
-      this.validateMenu();
+      if (this.validateMenu()) return;
 
       // TODO: Verify input fields are correct before doing \/ \/ \/
+      let loader = this.$loading.show({
+        loader: 'dots',
+        container: this.$refs["dialog_container"],
+        canCancel: false,
+      })
       this.$store.dispatch('getModulesFromServer').then(async () => {
+        
         const payload = {
           moduleName: this.newModule.name,
           colour: this.newModule.colour,
@@ -202,10 +204,14 @@ export default {
           };
           
           this.$store.dispatch("addSlot", payload).then(() => {
+            loader.hide();
             this.close();
             this.clearMenu();
           });
         });
+      }).catch((error) => {
+        loader.hide();
+        console.log(error.message);
       });
     },
 

@@ -4,7 +4,7 @@
     :colour="currSlot.colour"
     @close="close"
   >
-    <div class="dialog_container">
+    <div class="dialog_container" ref="dialog_container">
       <div class="detail_labels">
         <div class="time_d">Title</div>
         <div class="time_d">Module</div>
@@ -78,7 +78,7 @@
 
 <script>
 export default {
-  name: "ViewModuleMenu",
+  name: "ViewTimeSlot",
   data() {
     return {
       editing: false,
@@ -168,15 +168,15 @@ export default {
       } : null;
     },
     async updateSlot(){ //Object.is(ob1, ob2) -> true if equal, false if not
-      console.log("I am being called! YAYAYYAYAYAY");
       //await this.$store.dispatch('addModule', this.moduleInEdit);
+      let loader = this.$loading.show({
+        loader: 'dots',
+        container: this.$refs["dialog_container"],
+        canCancel: false,
+      })
       if (this.moduleInEdit.name != this.currModule.name){
-          //delete old timeslot in old module
-          this.deleteSlot();
-
-          //add new timeslot in new module
-          this.moduleInEdit.id = this.temp_module.find( mod => mod.name == this.moduleInEdit.name).id;
-          //do not change colour or lecturer
+        this.deleteSlot();
+        this.moduleInEdit.id = this.temp_module.find( mod => mod.name == this.moduleInEdit.name).id;
       }
       
       console.log(this.currModule, this.moduleInEdit);
@@ -192,15 +192,24 @@ export default {
       };
       
       this.$store.dispatch("addSlot", newSlot).then(() => {
+        loader.hide();
         this.edit();
         this.close();
       });
     },
     async deleteSlot(){
+      let loader = this.$loading.show({
+        loader: 'dots',
+        container: this.$refs["dialog_container"],
+        canCancel: false,
+      })
+
       await this.$store.dispatch('deleteTimeSlot', {
         moduleID: this.currSlot.modID,
         timeslotID: this.currSlot.id,
       });
+      
+      loader.hide();
       this.close();
     },
     close() {
@@ -265,15 +274,15 @@ export default {
 .icon_style{
   position: absolute;
   width: 3rem;
-  right: 1rem;
-  top: 1rem;
+  right: var(--normal-font-size);
+  top: var(--normal-font-size);
 }
 
 .delete_style{
   position: absolute;
   width: 3rem;
   right: 4rem;
-  top: 1rem;
+  top: var(--normal-font-size);
 }
 
 .input_box {

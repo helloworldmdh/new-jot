@@ -122,12 +122,6 @@ exports.authSignUp = functions.region('europe-west2').auth.user().onCreate((user
   })
 });
 
-exports.authDelete = functions.region('europe-west2').auth.user().onDelete((user) => {
-  return admin.firestore().collection('users').doc(user.uid).delete();
-});
-
-
-
 exports.addNote = functions.region('europe-west2').https.onCall((data, context) => {
   const uid = context.auth.uid;
   if (!uid)
@@ -214,8 +208,35 @@ exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, co
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
-  else
-     return admin.firestore().collection("users").doc(uid).delete().then(function () {
-        return ({ data: "Document successfully deleted!"});
-     })
+  else {
+    const func = async () => {
+      console.log("Starting deleting")
+      const client = require('firebase-tools');
+      await client.firestore.delete(`/users/${uid}/modules`,{
+        project: process.env.GCLOUD_PROJECT,
+        recursive: true,
+        yes: true,
+        force: true,
+        token: functions.config().fb.token,
+      }).then(() => {
+        console.log("deleted modules collection")
+      }).catch((error)=>{
+        console.log(error);
+      })
+      await admin.firestore().collection("users").doc(uid).delete();
+      console.log("deleted user doc")
+      await admin.auth().deleteUser(uid);
+    }
+    return func().then(()=>{
+      return ({ data: 'User successfully deleted!'});
+    });
+
+    // const docRef = admin.firestore().collection("users").doc(uid);
+    // docRef.delete('modules', {
+    
+    //   project: env.GCP_PROJECT
+    //   recursive: true,
+    //   yes: true,
+    // });
+  }
 });

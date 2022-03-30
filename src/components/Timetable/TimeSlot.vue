@@ -108,7 +108,7 @@ export default {
         margin-bottom: 0.1em;
         padding-left: 1em;
         height: 3em;
-        background-color: #A0E7E5;
+        background-color: #e0e0e0;
         border-radius: 0.35em;
         font-size: 15px;
         position: absolute;
@@ -125,6 +125,7 @@ export default {
         Style for the time shown on the right side
      */
     .time{
+        background-color: #e0e0e0;
         margin-left: 1em;
         padding-left: 1em;
         height: 3em;

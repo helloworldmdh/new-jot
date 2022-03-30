@@ -14,7 +14,7 @@ export default {
 div {
   border-radius: 12px;
   box-shadow: 0 9px 18px rgba(0,0,0,0.2);
-  padding: 1rem;
+  padding: var(--normal-font-size);
   margin: 2rem auto;
   max-width: 40rem;
 }

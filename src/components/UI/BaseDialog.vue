@@ -103,7 +103,7 @@ header {
   background-color: #5fccff;
   color: white;
   width: 100%;
-  padding: 1rem;
+  padding: var(--normal-font-size);
 }
 
 header h2 {
@@ -111,11 +111,11 @@ header h2 {
 }
 
 section {
-  padding: 1rem;
+  padding: var(--normal-font-size);
 }
 
 menu {
-  padding: 1rem;
+  padding: var(--normal-font-size);
   display: flex;
   justify-content: flex-end;
   margin: 0;

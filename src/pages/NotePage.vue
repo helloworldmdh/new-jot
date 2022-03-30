@@ -36,7 +36,7 @@
   <div class="notes_page">
     <base-card> Note Page </base-card>
     <div class="notes_container">
-      <div class="module_selection">
+      <div class="module_selection" ref="module_selection">
         <h3 class="mod_title">Modules</h3>
         <div class="module_cards"  v-for="(mod,index) in uniqueNames" :key="mod">
           <div :style="{'background-color': uniqueNames[index].colour }">
@@ -127,8 +127,14 @@ export default {
     },
 
     async refreshNotes() {
+      let loader = this.$loading.show({
+        loader: 'dots',
+        contianer: this.$refs["module_selection"],
+        canCancel: false,
+      })
       await this.$store.dispatch('getModulesFromServer');
       await this.$store.dispatch('getNotes');
+      loader.hide();
       this.modules = this.$store.getters.getterModules;
       this.notes = this.$store.getters.getterNotes;  
       this.sortByModule();
@@ -139,9 +145,12 @@ export default {
       if (!this.note.moduleID) return alert("Please add a module name!");
       if (!this.note.text) return alert("Please add some text!");
       if (!this.note.title) return alert("Please give the note a title!");
-      if (this.note.text.length > 3000) return alert("Please ensure the note is under 3000 characters...");
-
-  
+      if (this.note.text.length > 3000) return alert("Please ensure the note is under 3000 characters...");  
+      let loader = this.$loading.show({
+        loader: 'spinner',
+        container: this.$refs["dialog_content_wrapper"],
+        canCancel: false,
+      })
 
       const newnote = {
         modID: this.note.moduleID,
@@ -150,9 +159,9 @@ export default {
         date: this.note.date,
         id: this.note.id
       }
-      console.log(newnote)
 
       await this.$store.dispatch('addNote', newnote).then(async () => {
+        loader.hide();
         this.refreshNotes();
         this.closeDialogBox();
         this.cancelEditing();
@@ -267,7 +276,7 @@ body {
 
 .mod_title{
   text-align: left;
-  padding-left: 1rem;
+  padding-left: var(--normal-font-size);
   padding-bottom:0.4rem;
   border-bottom: 1px solid #0a0053;
   border-top: 1px solid #0a0053;
@@ -284,14 +293,14 @@ body {
 .note_taking{
   float: left;
   border-top: 2px solid #0a0053;
-  padding-left: 1rem;
+  padding-left: var(--normal-font-size);
   height: 65vh;
   width: 80%;
 } 
 
 
 .input_color{
-  margin-top: 1rem;
+  margin-top: var(--normal-font-size);
   border-radius: 5px;
   right: 2rem;
   padding: 0 0 0;

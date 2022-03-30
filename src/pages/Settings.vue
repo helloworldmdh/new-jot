@@ -1,22 +1,52 @@
 <template>
   <base-card>Settings</base-card>
+  <base-dialog :colour="moduleInEdit.colour" :show="editing" @close="closeEdit" :title="'Editing Module: '+moduleInEdit.name">
+    <div class="dialog_container">
+    <div class="detail_labels">
+        <div class="mod_d">Module Name</div>
+        <div class="mod_d">Module Colour</div>
+        <div class="mod_d">Lecturer</div>
+      </div>
+    <div><input
+      type="text"
+      class="input_modname"
+      v-model.trim="moduleInEdit.name"
+      required
+    /><br />
+    <input
+      type="color"
+      class="input_color"
+      v-model="moduleInEdit.colour"
+      required
+    /><br />
+    <input
+      type="text"
+      class="input_lecturer"
+      v-model.trim="moduleInEdit.lecturer"
+      required
+    /><br />
+    </div>
+    </div>
+    <template #actions>
+      <button class="btn btn-primary m-3" @click="updateModule">Update</button>
+    </template>
+  </base-dialog>
   <div class="setting_page">
     <div class="user_details">
       <div class="user">Email: {{ email }}</div>
       <ul class="user">
         Modules:
         <li class="mod_names" v-for="m in modules" :key="m">
-          {{ m.name }}
+          <div class="modname_item">{{ m.name }}</div> <box-icon class="edit_icon" name='pencil' size="sm" :color="computedAccentColour" animation="tada-hover" @click="edit(m)"></box-icon>
         </li>
       </ul>
       <div class="user">Total Time Studied: {{ timeStudied }} minutes</div>
-      <button class="sett_btn pass">Change Password</button>
     </div>
     <div class="option_one"></div>
     <div class="option_two">
       <h3>Delete Account</h3>
-      <p>Warning : This cannot be undone</p>
-      <button class="sett_btn del" @click="toggleWarning">
+      <p>Warning : This action cannot be undone</p>
+      <button class="sett_btn del btn btn-primary m-3" @click="toggleWarning">
         Delete account
       </button>
     </div>
@@ -38,6 +68,7 @@
 import app from "../api/firebase";
 import { getAuth } from "firebase/auth";
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import BaseDialog from '../components/UI/BaseDialog.vue';
 
 export default {
   mounted() {
@@ -45,13 +76,15 @@ export default {
     this.email = auth.currentUser.email;
   },
   name: "Settings",
-  components: {},
+  components: {BaseDialog},
   data() {
     return {
       email: "",
       modules: [],
       timeStudied: 0,
+      moduleInEdit:{},
       warning: false,
+      editing: false,
     };
   },
   async created() {
@@ -62,12 +95,35 @@ export default {
   },
   methods: {
     async deleteAccount() {
-      const functions = getFunctions(app);
+      const functions = getFunctions(app, 'europe-west2');
       const deleteUserInfo = httpsCallable(functions, 'deleteUserInfo');
       await deleteUserInfo();
     },
     toggleWarning() {
       this.warning = !this.warning;
+    },
+    edit(mod) {
+      this.editing = true;
+      this.moduleInEdit = JSON.parse(JSON.stringify(mod));
+    },
+    async closeEdit() {
+      this.editing = false;
+      await this.$store.dispatch("getModulesFromServer");
+      this.modules = this.$store.getters.getterModules;
+    },
+    updateModule() {
+      console.log(this.moduleInEdit)
+      this.$store.dispatch('addModule', {
+        id: this.moduleInEdit.id,
+        moduleName: this.moduleInEdit.name,
+        colour: this.moduleInEdit.colour,
+        lecturer: this.moduleInEdit.lecturer,
+      }).then(async () => {
+        this.editing = false;
+        await this.$store.dispatch("getModulesFromServer");
+        this.modules = this.$store.getters.getterModules;
+      })
+
     },
   },
 };
@@ -87,26 +143,62 @@ export default {
   background-color: white;
 }
 
+.edit_icon{
+  display:inline-block;
+  margin-left: var(--normal-font-size);
+}
+
 .user {
   margin-top: 0.5rem;
   padding-left: 0rem;
 }
 
 .mod_names {
+  width: 25rem;
   margin-left: 6rem;
   text-decoration: none;
+  list-style-type: none;
 }
 
+.dialog_container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.mod_d{
+  margin: 0.3em 0 0.85em;
+}
+
+.input_modname,
+.input_lecturer{
+  margin: 0.2rem 0 0.2rem;
+  width: 15rem;
+}
+
+.input_color{
+  margin-top: 0.25rem;
+  width: 7.5rem;
+}
+
+.modname_item{
+  margin-top: 0.5rem;
+  display: inline-block;
+  width: 15rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+
 .sett_btn {
+  height: 54px;
+  width: 14rem;
   position: absolute;
   margin: 0.5em;
   border-width: 2px;
-  border-color: #6867a1;
-  background-color: #f8f8f8;
 }
 
 .pass {
-  right: 1rem;
+  right: var(--normal-font-size);
   bottom: 1.5rem;
 }
 
@@ -122,9 +214,6 @@ export default {
   margin: 2rem auto 2rem auto;
   padding-top: 2rem;
   height: auto;
-  border-top-style: solid;
-  border-top-color: var(--main-color);
-  border-top-width: 4px;
 }
 
 .backdrop {
@@ -157,6 +246,6 @@ header {
   background-color: #5fccff;
   color: white;
   width: 100%;
-  padding: 1rem;
+  padding: var(--normal-font-size);
 }
 </style>

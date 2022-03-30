@@ -15,6 +15,7 @@
     "marked": "^4.0.12",
     "uniqid": "^5.4.0",
     "vue": "^3.2.31",
+    "vue-loading-overlay": "5.0",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2"
   },

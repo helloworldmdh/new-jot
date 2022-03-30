@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import {createRouter, createWebHistory } from 'vue-router';
 import routes from './router/routes';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 import {createStore} from 'vuex';
 import mainstore from './stores/main/mainstore.js';
@@ -42,4 +44,5 @@ app.component('base-card', BaseCard);
 app.component('base-dialog', BaseDialog)
 app.use(router);
 app.use(store);
+app.use(Loading);
 app.mount('#app');

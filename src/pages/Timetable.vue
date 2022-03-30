@@ -2,7 +2,7 @@
 <div id="main_container">
   <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTableAndClose"></add-module-menu>
   <a class="floating-btn" @click="openBox">+</a>
-  <view-module-menu :show="slotSelect" @closeModuleMenu="unselect" 
+  <view-time-slot :show="slotSelect" @closeModuleMenu="unselect" 
     :selected="slotSelect"
     :currSlot="selectedSlot"
   />
@@ -13,8 +13,8 @@
         :length="60"
         :startTime="(i-1)*60"
         :day="-1"
+        :colour="'#b1e0ff'"
         >
-
         </time-slot>
     </div>
     <div :class="dayStyle(day)" v-for="day in 7" :key="day">
@@ -37,7 +37,7 @@
 <script>
 import TimeSlot from "../components/Timetable/TimeSlot.vue";
 import AddModuleMenu from "../components/Timetable/AddModuleMenu.vue";
-import ViewModuleMenu from '../components/Timetable/ViewModuleMenu.vue';
+import ViewTimeSlot from '../components/Timetable/ViewTimeSlot.vue';
 
 
 export default {
@@ -47,7 +47,7 @@ export default {
   components: {
     TimeSlot,
     AddModuleMenu,
-    ViewModuleMenu,
+    ViewTimeSlot,
   },
   mounted(){
     document.getElementById('15').scrollIntoView({block: 'center'});
@@ -72,13 +72,10 @@ export default {
 
     async updateTable(){
       await this.$store.dispatch('getTimeSlots');
-      let temp = this.$store.getters.getterTimeSlots;
-      if (!temp) this.baseTimeSlots = []
-      else this.baseTimeSlots = temp;
+      this.baseTimeSlots = this.$store.getters.getterTimeSlots;
+      if (this.baseTimeSlots.length == 0) this.openBox();
       await this.$store.dispatch('getModulesFromServer');
-      temp = this.$store.getters.getterModules;
-      if (!temp) this.existingModules = []
-      else this.existingModules = temp
+      this.existingModules = this.$store.getters.getterModules;
       this.addColour();
       this.splitByDay();
       this.checkOverlap();
@@ -134,15 +131,11 @@ export default {
       this.slotSelect = true;
     },
     unselect(){
-      console.log("unselect has been called!");
       this.slotSelect = false;
       this.updateTable();
     },
     async deleteSlot(){
-      await this.$store.dispatch('deleteSlot', {
-        moduleID: this.selectedSlot.modID,
-        timeslotID: this.selectedSlot.id,
-      });
+
       this.updateTable;
       this.slotSelect = false;
     },
@@ -261,7 +254,7 @@ export default {
 .floating-btn{
   width: 80px;
   height: 80px;
-  background: #5ac0f0;
+  background: var(--main-color);
   display: flex;
   align-items: center;
   justify-content: center;
