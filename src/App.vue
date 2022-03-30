@@ -8,8 +8,6 @@
 <script>
 import TheSidebar from './components/Sidebar/TheSidebar.vue';
 import { sidebarWidth } from './components/Sidebar/sidebar-state.js';
-// import app from './api/firebase.js';
-// import { getAuth } from 'firebase/auth';
 
 export default {
   name: 'App',

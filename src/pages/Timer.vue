@@ -1,6 +1,6 @@
 <template>
   <div class="timer_page">
-    <div class="header">Timer</div>
+    <base-card>Timer</base-card>
     <div class="total_time">
       Total time studied:<br> {{ computedTime }} minutes
     </div>
@@ -35,7 +35,7 @@
           class="slider"
           id="studyTime"
         />
-        <div class="currSelect">{{ selectStudy }} minutes</div>
+        <div class="curr_select">{{ selectStudy }} minutes</div>
         <div class="desc">Rest Time</div>
         <input
           type="range"
@@ -46,7 +46,7 @@
           class="slider"
           id="restTime"
         />
-        <div class="currSelect">{{ selectRest }} minutes</div>
+        <div class="curr_select">{{ selectRest }} minutes</div>
         <div class="desc">Number of Sessions</div>
         <input
           type="range"
@@ -55,13 +55,13 @@
           v-model="sessions"
           step="1"
           class="slider"
-          id="numSessions"
+          id="num-sessions"
         />
-        <div class="currSelect">{{ sessions }}</div>
+        <div class="curr_select">{{ sessions }}</div>
       </div>
 
       <button type="submit" v-if="!timerOn" @click="startTimer">Start</button>
-      <div class="timerInProgress" v-if="timerOn">
+      <div class="timer_in_progress" v-if="timerOn">
         <div v-if="!timerPaused">
           <button
             type="submit"
@@ -224,7 +224,6 @@ export default {
       const saveNewTime = httpsCallable(functions, "saveNewTime");
       // eslint-disable-next-line no-unused-vars
       const uid = auth.currentUser.uid;
-      //const timeStudied = this.getTotalTime();
       if (!uid) return;
 
       saveNewTime({
@@ -245,11 +244,6 @@ export default {
   height: 90vh;
 }
 
-.header {
-  font-size: 64px;
-  font-weight: 300;
-  text-align: center;
-}
 .clock {
   height: 20vh;
   text-align: center;
@@ -307,18 +301,18 @@ p {
   border-radius: 0.2em;
 }
 
-.timerInProgress {
+.timer_in_progress {
   display: block;
   margin-top: 2rem;
 }
 
-.currSelect {
+.curr_select {
   font-family: "Montserrat", sans-serif;
   font-size: 18px;
   font-weight: 300;
 }
 
-.numsessions {
+.num-sessions {
   margin-bottom: 0.5em;
   height: 1.5rem;
   width: 20%;

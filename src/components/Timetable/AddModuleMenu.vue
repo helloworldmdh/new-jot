@@ -76,7 +76,7 @@ export default {
       newTimeSlot: {
         title: "",
         mod: "",
-        day: null,
+        day: 0,
         startTime: null,
         length: null,
       },
@@ -115,12 +115,12 @@ export default {
         this.newTimeSlot.startTime;
     },
     modName(name) {
-      //if (name == "") this.valid.module = "invalid";
       if (this.existingModules) {
         const mod = this.existingModules.find((mod) => mod.name == name);
         if (mod) {
           this.colourDisabled = true;
           this.newModule.colour = mod.colour
+          this.newModule.lecturer = mod.lecturer
         } else {
           this.colourDisabled = false;
         }
@@ -141,10 +141,27 @@ export default {
     },
 
     validateMenu() {
-      if (!this.modName) {
-        alert('please give a module name!');
+      if (!this.newTimeSlot.title.trim()) {
+        alert('Please give the timeslot a name!');
         return false;
       }
+      if (!this.newTimeSlot.mod.trim()) {
+        alert('Please give the module name!');
+        return false;
+      }
+      if (!this.newTimeSlot.startTime) {
+        alert('Please enter the time when your module starts!');
+        return false;
+      }
+      if (!this.newTimeSlot.length || this.newTimeSlot.length <= 0) {
+        alert('Please enter a valid finishing time!');
+        return false;
+      }
+      if (this.newModule.lecturer == "" || this.newModule.lecturer.length < 0) {
+        alert('please enter a valid lecturer name!');
+        return false;
+      }
+      return true;
     },
 
     clearMenu() {
@@ -167,9 +184,8 @@ export default {
     },
 
     submit() {
-      if (this.validateMenu()) return;
+      if (!this.validateMenu()) return;
 
-      // TODO: Verify input fields are correct before doing \/ \/ \/
       let loader = this.$loading.show({
         loader: 'dots',
         container: this.$refs["dialog_container"],

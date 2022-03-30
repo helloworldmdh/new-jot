@@ -1,7 +1,7 @@
 <template>
   <base-card>Settings</base-card>
   <base-dialog :colour="moduleInEdit.colour" :show="editing" @close="closeEdit" :title="'Editing Module: '+moduleInEdit.name">
-    <div class="dialog_container">
+    <div class="dialog_container" ref="dialog_container">
     <div class="detail_labels">
         <div class="mod_d">Module Name</div>
         <div class="mod_d">Module Colour</div>
@@ -32,12 +32,14 @@
     </template>
   </base-dialog>
   <div class="setting_page">
-    <div class="user_details">
+    <div class="user_details" ref="user_details">
       <div class="user">Email: {{ email }}</div>
       <ul class="user">
         Modules:
         <li class="mod_names" v-for="m in modules" :key="m">
-          <div class="modname_item">{{ m.name }}</div> <box-icon class="edit_icon" name='pencil' size="sm" :color="computedAccentColour" animation="tada-hover" @click="edit(m)"></box-icon>
+          <div class="modname_item">{{ m.name }}</div> 
+          <box-icon class="edit_icon" name='pencil' size="sm" :color="computedAccentColour" animation="tada-hover" @click="edit(m)"></box-icon>
+          <box-icon class="edit_icon" name="trash" size="sm" :color="computedAccentColour" animation="tada-hover" @click="deleteModule(m)"></box-icon>
         </li>
       </ul>
       <div class="user">Total Time Studied: {{ timeStudied }} minutes</div>
@@ -71,10 +73,6 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import BaseDialog from '../components/UI/BaseDialog.vue';
 
 export default {
-  mounted() {
-    const auth = getAuth(app);
-    this.email = auth.currentUser.email;
-  },
   name: "Settings",
   components: {BaseDialog},
   data() {
@@ -88,16 +86,29 @@ export default {
     };
   },
   async created() {
-    await this.$store.dispatch("getModulesFromServer");
-    await this.$store.dispatch("getTotalTime");
-    this.modules = this.$store.getters.getterModules;
-    this.timeStudied = this.$store.getters.getterTotalTime;
+    await this.updateSettingsPage();
+    const auth = getAuth(app);
+    this.email = auth.currentUser.email
   },
+    
   methods: {
     async deleteAccount() {
       const functions = getFunctions(app, 'europe-west2');
       const deleteUserInfo = httpsCallable(functions, 'deleteUserInfo');
-      await deleteUserInfo();
+
+      let loader = this.$loading.show({
+        loader: 'dots',
+        contianer: this.$refs["dialog_container"],
+        canCancel: false,
+      });
+
+      await deleteUserInfo().then(() => {
+        this.$router.replace('/');
+      }).catch((error)=>{
+        alert(error.message);
+      });
+
+      loader.hide();
     },
     toggleWarning() {
       this.warning = !this.warning;
@@ -111,9 +122,14 @@ export default {
       await this.$store.dispatch("getModulesFromServer");
       this.modules = this.$store.getters.getterModules;
     },
-    updateModule() {
+    async updateModule() {
       console.log(this.moduleInEdit)
-      this.$store.dispatch('addModule', {
+      let loader = this.$loading.show({
+        loader: 'dots',
+        contianer: this.$refs["user_details"],
+        canCancel: false,
+      });
+      await this.$store.dispatch('addModule', {
         id: this.moduleInEdit.id,
         moduleName: this.moduleInEdit.name,
         colour: this.moduleInEdit.colour,
@@ -123,13 +139,37 @@ export default {
         await this.$store.dispatch("getModulesFromServer");
         this.modules = this.$store.getters.getterModules;
       })
+      loader.hide();
+    },
+    async deleteModule(mod){
+      let loader = this.$loading.show({
+        loader: 'dots',
+        contianer: this.$refs["user_details"],
+        canCancel: false,
+      });
+      await this.$store.dispatch('deleteModule', mod.id);
+      loader.hide();
+      this.updateSettingsPage();
+    },
+    async updateSettingsPage(){
+      let loader = this.$loading.show({
+        loader: 'dots',
+        contianer: this.$refs["dialog_container"],
+        canCancel: false,
+      });
 
+      await this.$store.dispatch("getModulesFromServer");
+      await this.$store.dispatch("getTotalTime");
+      this.modules = this.$store.getters.getterModules;
+      this.timeStudied = this.$store.getters.getterTotalTime;
+
+      loader.hide();
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
 .user_details {
   padding: 2rem;
   position: relative;
@@ -187,7 +227,6 @@ export default {
   overflow: hidden;
   white-space: nowrap;
 }
-
 
 .sett_btn {
   height: 54px;

@@ -1,13 +1,13 @@
 <template>
-  <div class="login-body">
+  <div class="login_body">
     <div class="header">
       <img class="logo" src="../assets/img/logo.png"/>
       <router-link to="/aboutus" class="link">About the App</router-link>
     </div>
-    <div class="page-form">
-      <h1 class="login-title">{{ signIn ? "Sign in" : "Sign up" }}</h1>
+    <div class="page_form">
+      <h1 class="login_title">{{ signIn ? "Sign in" : "Sign up" }}</h1>
       <div>
-        <form class="sign-in-form" @submit.prevent="">
+        <form class="sign_in_form" @submit.prevent="">
           <input
             v-model.trim="email.val"
             type="email"
@@ -53,7 +53,6 @@ export default {
   data() {
     return {
       signIn: true,
-      // username: "",
       email: {
         val: "",
         isValid: false,
@@ -74,14 +73,6 @@ export default {
     };
   },
 
-  // use this if you want to give the username to anyone
-  // could possibly be done with emits instead if you don't want this to be App.vue
-  // probably better to store this with vuex
-  // provide() {
-  //   return {
-  //     name: this.username,
-  //   }
-  // },
 
   computed: {
     informUser() {
@@ -109,7 +100,6 @@ export default {
     },
 
     validateForm() {
-      //this.formIsValid = this.email.val.includes('@.') && (!this.signIn ? this.confirmedPass.val > 7 : this.password.val > 7);
       this.formIsValid = true;
 
       this.email.isValid = this.email.val.includes("@") && this.email.val.includes(".");
@@ -145,17 +135,7 @@ export default {
         }).catch((error)=>{
           this.error = error.message;
         })
-         //.then((userCredential) => {
-        //   // var user = userCredential.user;
-        //   // document.cookie = "accessToken=" + user.accessToken;
-        //   // console.log("Cookie Jar Access Token : ", getCookie("accessToken"));
-        //   // localStorage.setItem('access token', user.accessToken);
-        // }).catch((error) => {
-        //   alert(error.message);
-        // })
       }
-
-      
     },
 
     signup(){
@@ -173,7 +153,7 @@ export default {
 </script>
 
 <style scoped>
-.login-body {
+.login_body {
   background: url(../assets/img/landing.jpg) no-repeat;
   height: 100vh;
   background-size: auto auto;
@@ -207,11 +187,11 @@ export default {
 .link:hover {
   text-decoration: underline;
 }
-.login-title {
+.login_title {
   font-size: 40px;
 }
 
-.page-form {
+.page_form {
   justify-content: center;
   padding: 1rem;
   top: 6vh;
@@ -226,15 +206,15 @@ export default {
   background-color: aliceblue;
 }
 
-.sign-in-form {
+.sign_in_form {
   display: grid;
   padding-top: 20px;
   padding-left: 10%;
   padding-right: 10%;
 }
 
-.sign-in-form input,
-.sign-in-form button {
+.sign_in_form input,
+.sign_in_form button {
   margin-bottom: 20px;
 }
 

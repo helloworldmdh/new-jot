@@ -72,7 +72,7 @@ export default {
         },
         computedStyle() {
             if (this.day == -1) return 'time'
-            return 'normal-slot';
+            return 'normal_slot';
         },
         computedFont() {
             // Counting the perceptive luminance - human eye favors green color...
@@ -103,7 +103,7 @@ export default {
     /*
         Style for all of the time slots on the timetable
     */
-    .normal-slot{
+    .normal_slot{
         margin-left: 1em;
         margin-bottom: 0.1em;
         padding-left: 1em;

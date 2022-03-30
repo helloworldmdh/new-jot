@@ -12,5 +12,4 @@ export default [
     { path: '/timer', component: loadPage('Timer'), meta: { requiresAuth: true } },
     { path: '/notfound', component: loadPage('NotFound') },
     { path: '/:notFound(.*)', redirect: '/notfound'} // catchAll route
-    //copy and paste above with other page details to establish further routes
 ]

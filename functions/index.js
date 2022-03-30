@@ -4,8 +4,6 @@ require('cors')({ origin: true });
 admin.initializeApp();
 const db = admin.firestore();
 
-// Create and Deploy Your First Cloud Functions
-// https://firebase.google.com/docs/functions/write-firebase-functions  
 
 exports.getTimeslots = functions.region('europe-west2').https.onCall((data, context) => {  
   const getData = async () => {
@@ -35,7 +33,6 @@ exports.getTimeslots = functions.region('europe-west2').https.onCall((data, cont
   }
   return getData()
   .then((response) => { 
-      // console.log(response);
       return response;
   });
 })
@@ -111,7 +108,6 @@ exports.gettotaltime = functions.region('europe-west2').https.onCall((request, c
         console.log('No matching documents.');
         return ({ data: 'No user data in database' });
       }
-      // 2. Send data back to client
       return ({ data: doc.data().timeStudied});
     });
 });
@@ -166,7 +162,7 @@ exports.getNotes = functions.region('europe-west2').https.onCall((data, context)
 
   return getData()
   .then((response) => { 
-      // console.log(response);
+
       return response;
   });
 })
@@ -185,10 +181,21 @@ exports.deleteModule = functions.region('europe-west2').https.onCall((data, cont
   const uid = context.auth.uid;
   if (!uid)
     throw new functions.https.HttpsError('no-userid', 'The requested user was not found');
-  else
-    return admin.firestore().collection('users').doc(uid).collection('modules').doc(data.moduleID).delete().then(() => {
-      return ({data: 'Document successfully deleted!'});
+  else{
+    const func = async () => {
+      const client = require('firebase-tools');
+      await client.firestore.delete(`/users/${uid}/modules/${data}/`,{
+        project: process.env.GCLOUD_PROJECT,
+        recursive: true,
+        yes: true,
+        force: true,
+        token: functions.config().fb.token,
+      })
+    }
+    return func().then(() => {
+      return ({ data: 'Module successfully deleted'});
     });
+  }
 });
 
 
@@ -230,13 +237,5 @@ exports.deleteUserInfo = functions.region('europe-west2').https.onCall((data, co
     return func().then(()=>{
       return ({ data: 'User successfully deleted!'});
     });
-
-    // const docRef = admin.firestore().collection("users").doc(uid);
-    // docRef.delete('modules', {
-    
-    //   project: env.GCP_PROJECT
-    //   recursive: true,
-    //   yes: true,
-    // });
   }
 });

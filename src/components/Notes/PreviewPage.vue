@@ -2,11 +2,12 @@
   <teleport to="body">
     <div v-if="show" @click="tryClose" class="backdrop"></div>
     <dialog open v-if="show">
-      <header :style="{'background-color': colour}">
+      <header :style="{'background-color': colour, 'color': computedFont}">
         <slot name="header">
+          <div>Date: {{ date }}</div>
           <h2>{{ title }}</h2>
-          <box-icon class="icon_style" name='pencil' size="cssSize" color="white" animation="tada-hover" @click="tryEdit"></box-icon>
-          <box-icon class="delete_style" name='trash' size="cssSize" color="white" animation="tada-hover" @click="tryDelete"></box-icon>
+          <box-icon class="icon_style" name='pencil' size="cssSize" :color="computedFont" animation="tada-hover" @click="tryEdit"></box-icon>
+          <box-icon class="delete_style" name='trash' size="cssSize" :color="computedFont" animation="tada-hover" @click="tryDelete"></box-icon>
         </slot>
       </header>
       <section>
@@ -36,15 +37,36 @@ export default {
     colour: {
       type: String,
       required: true,
+    },
+    date:{
+      type: String,
+      required: true,
     }
   },
   emits: ['closePreviewPage', 'editNote', 'deleteNote'],
   computed: {
     convertFromMD() {
       return marked(this.text, { breaks: true, smartypants: true});
-    }
+    },
+    computedFont() {
+      // Counting the perceptive luminance - human eye favors green color...
+      if (this.colour.length != 7) return "#646464"
+      var luminance = (0.299 * this.hexToRgb(this.colour).r + 0.587 * this.hexToRgb(this.colour).g + 0.114 * this.hexToRgb(this.colour).b)/255;
+      if (luminance < 0.5)
+        return "#ffffff"
+      else
+        return "#000000"
+    },
   },
   methods: {
+    hexToRgb(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    },
     tryClose() {
       console.log(this.colour)
       this.$emit('closePreviewPage');
@@ -104,6 +126,13 @@ header h2 {
   top: 1rem;
 }
 
+.download_style{
+  position: absolute;
+  width: 3rem;
+  right: 1rem;
+  bottom: 1rem;
+}
+
 .delete_style{
   position: absolute;
   width: 3rem;
@@ -131,5 +160,9 @@ menu {
 
 .text_output{
   text-align: left;
+  overflow-wrap: break-word;
+  hyphens: manual;
+  overflow: scroll;
+  max-height: 35rem;
 }
 </style>

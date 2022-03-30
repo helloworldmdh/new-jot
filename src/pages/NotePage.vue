@@ -4,6 +4,7 @@
     :title="selectedNote.title" 
     :text="selectedNote.text" 
     :colour="selectedNote.colour"
+    :date="selectedNote.date"
     @deleteNote="deleteNote"
     @closePreviewPage="closePreviewPage" 
     @editNote="editNote" >
@@ -12,20 +13,16 @@
   <base-dialog :show="dialogBoxShow" @close="closeDialogBox" title="Note Preview">
     <div class="dialog_content_wrapper">
       <label>Title:</label>
-      <input type="text" placeholder="title" v-model="note.title" required/>
+      <input class="input_note" type="text" placeholder="title" v-model="note.title" required/>
       <br>
       <label>Date Created:</label>
-      <input type="date" v-model="note.date" required/>
+      <input class="input_note" type="date" v-model="note.date" required/>
       <br>
       <label>Module Name:</label>
-      <select v-model="note.moduleID" required>
+      <select class="input_note select_mod" v-model="note.modID" required>
         <option v-for="mod in modules" :key="mod.id" :value="mod.id">{{ mod.name }}</option>
       </select>
       <br>
-      <label>Note:</label>
-      <div>
-        <p class="note_display">{{ notePreview }}</p>
-      </div>
     </div>
     <template #actions>
       <div class="actn-btn-wrapper">
@@ -40,14 +37,14 @@
         <h3 class="mod_title">Modules</h3>
         <div class="module_cards"  v-for="(mod,index) in uniqueNames" :key="mod">
           <div :style="{'background-color': uniqueNames[index].colour }">
-            {{ mod.name }}
-            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-color': uniqueNames[index].colour }" @click="selectNote(n, uniqueNames[index].colour)"> {{ n.title }} </div>
+            <div :style="{'color': getAccentColour(uniqueNames[index].colour)}">{{ mod.name }}</div>
+            <div v-for="n in notes[index]" :key="n" class="note_details" :style="{'border-top': '1px solid #04011f'}" @click="selectNote(n, uniqueNames[index].colour)"> {{ n.title }} </div>
            </div>
         </div>
       </div>
       <button class="btn btn-primary" v-if="currentlyEditing" @click="cancelEditing">Cancel Editing</button>
       <div class="note_taking">
-        <textarea class="text" v-model="note.text" placeholder="Start typing here.." :style="{ width: computedWidth}" />
+        <textarea class="text" v-model="note.text" placeholder="Start typing here.."/>
         <m-d-guide/>
       </div>
     </div>
@@ -58,7 +55,6 @@
 import PlusIcon from '../components/UI/PlusIcon.vue';
 import PreviewPage from '../components/Notes/PreviewPage.vue'
 import MDGuide from '../components/Notes/MDguide.vue'
-import { guideWidth } from '../components/Notes/MDguide.js'
 
 export default {
   name: "NotePage",
@@ -68,8 +64,7 @@ export default {
     MDGuide,
   },
   async mounted () {
-    await this.refreshNotes()
-    console.log(this.notes);
+    await this.refreshNotes();
   },
   data() {
     return {
@@ -77,7 +72,7 @@ export default {
       modules:[],
       notes: [],
       note:{ 
-        moduleID: '',
+        modID: '',
         text: '',
         title: '',
         date: '',
@@ -93,15 +88,34 @@ export default {
     
   },
   computed: {
-    notePreview(){
-      return this.note.text.length > 200 ? this.note.text.substring(0,200) + "..." : this.note.text;
-    },
-    computedWidth(){
-        var newWidth = 80 - parseInt(guideWidth.value);
-        return newWidth;
+    currentDate(){
+      return new Date();
     }
   },
   methods: {
+    getAccentColour(colour) {
+      // Counting the perceptive luminance - human eye favors green color...
+      if (colour.length != 7) return "#646464"
+      var luminance = (0.299 * this.hexToRgb(colour).r + 0.587 * this.hexToRgb(colour).g + 0.114 * this.hexToRgb(colour).b)/255;
+      if (luminance < 0.5)
+        return "#ffffff"
+      else
+        return "#000000"
+    },
+
+    dateSetter(event){
+      this.note.date = event.target.value;
+    },
+
+    hexToRgb(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    },
+    
     openDialogBox(){
       this.dialogBoxShow = true;
     },
@@ -113,15 +127,13 @@ export default {
       this.closePreviewPage();
       console.log(this.selectedNote)
       this.currentlyEditing = true;
-      this.note.text = this.selectedNote.text;
-      this.note.id = this.selectedNote.id;
-      this.note.title = this.selectedNote.title;
-      this.note.moduleID = this.selectedNote.modID;
-      this.note.date= this.selectedNote.date;
+  
+      this.note = JSON.parse(JSON.stringify(this.selectedNote))
+      
     },
 
     cancelEditing() {
-      this.resetInputs()
+      this.refreshNotes();
       this.currentlyEditing = false;
       this.note.id = null
     },
@@ -139,10 +151,14 @@ export default {
       this.notes = this.$store.getters.getterNotes;  
       this.sortByModule();
       this.resetInputs();
+
+      let date = new Date();
+      date.setDate(date.getDate());
+      this.note.date = date.getFullYear() + '-' + ('0' + (date.getMonth()+1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
     },
     
     async sendNote(){
-      if (!this.note.moduleID) return alert("Please add a module name!");
+      if (!this.note.modID) return alert("Please add a module name!");
       if (!this.note.text) return alert("Please add some text!");
       if (!this.note.title) return alert("Please give the note a title!");
       if (this.note.text.length > 3000) return alert("Please ensure the note is under 3000 characters...");  
@@ -153,7 +169,7 @@ export default {
       })
 
       const newnote = {
-        modID: this.note.moduleID,
+        modID: this.note.modID,
         text: this.note.text,
         title: this.note.title,
         date: this.note.date,
@@ -173,7 +189,7 @@ export default {
 
     async deleteNote(){
       await this.$store.dispatch('deleteNote', {
-        moduleID: this.selectedNote.modID,
+        modID: this.selectedNote.modID,
         noteID: this.selectedNote.id,
       });
       this.closePreviewPage();
@@ -241,9 +257,13 @@ body {
 }
 
 .module_cards {
-  padding: 1em;
+  margin: 1em;
   height: auto;
   border-radius: 5px;
+  border: 1px solid #04011f;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: 0 9px 18px rgba(0,0,0,0.2);
 }
 
 .note_details {
@@ -274,12 +294,17 @@ body {
   border-right-color: #0a0053;
 }
 
+label{
+  width: 12rem;
+}
+
 .mod_title{
   text-align: left;
   padding-left: var(--normal-font-size);
+  padding-top:0.4rem;
   padding-bottom:0.4rem;
-  border-bottom: 1px solid #0a0053;
-  border-top: 1px solid #0a0053;
+  border-bottom: 2px solid #0a0053;
+  border-top: 2px solid #0a0053;
 }
 
 .dialog_content_wrapper label {
@@ -291,6 +316,7 @@ body {
 }
 
 .note_taking{
+  justify-content: left;
   float: left;
   border-top: 2px solid #0a0053;
   padding-left: var(--normal-font-size);
@@ -298,6 +324,9 @@ body {
   width: 80%;
 } 
 
+.input_note {
+  width: 15rem;
+}
 
 .input_color{
   margin-top: var(--normal-font-size);
@@ -306,10 +335,15 @@ body {
   padding: 0 0 0;
 }
 
+.select_mod{
+  margin-left: 20px;
+}
+
 .text{
   border: 0px;
   margin-top: 2rem;
-  width: 100%;
+  width: 75%;
+  float:left;
   height: 80vh;
   resize: none;
   outline: none;

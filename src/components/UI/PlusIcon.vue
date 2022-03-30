@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a class="floating-btn" @click="$emit('plusclicked')">+</a>
+    <a class="floating_btn" @click="$emit('plusclicked')">+</a>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ export default {
 </script>
 
 <style scoped>
-.floating-btn{
+.floating_btn{
   width: 80px;
   height: 80px;
   background: #5ac0f0;
@@ -31,7 +31,7 @@ export default {
   cursor: pointer;
 }
 
-.floating-btn:active {
+.floating_btn:active {
   background: #4593b8;
 }
 

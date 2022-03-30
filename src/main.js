@@ -37,8 +37,7 @@ router.beforeEach(function(to, _, next){
 });
 
 const app = createApp(App);
-// Make sure to _use_ the router instance to make the
-// whole app router-aware.
+
 app.component('base-button', BaseButton);
 app.component('base-card', BaseCard);
 app.component('base-dialog', BaseDialog)

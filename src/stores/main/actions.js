@@ -69,8 +69,6 @@ export default {
       length: payload.length,
       day: payload.day,
     }).then((result) => {
-      // Read result of the Cloud Function.
-      // /** @type {any} */
       console.log(result);
     }).catch((error) => {
       console.log(error);
@@ -86,30 +84,12 @@ export default {
       colour: payload.colour,
       lecturer: payload.lecturer,
     }).then((result) => {
-        // Read result of the Cloud Function.
-        // /** @type {any} */
         console.log(result);
       })
       .catch((error) => {
         console.log(error);
       });
   },
-  
-  //async editTimeSlot(){
-  // const updateTimeslot = httpsCallable(functions, "updateTimeslot");
-  // await updateTimeslot({
-  //   moduleID: payload.moduleID,
-  //   timeslotID: payload.timeslotID,
-  //   title: payload.title,
-  //   startTime: payload.startTime,
-  //   length: payload.length,
-  //   day: payload.day,
-  // }).then((result) => {
-  //     console.log(result);
-  // }).catch((error) => {
-  //   console.log(error);
-  // });
-  // }
 
   async getTimeSlots(context){
     const functions = getFunctions(app, 'europe-west2');
@@ -138,8 +118,6 @@ export default {
       date: payload.date,
       text: payload.text,
     }).then((result) => {
-        // Read result of the Cloud Function.
-        // /** @type {any} */
         console.log(result);
       }).catch((error) => {
         console.log(error);
@@ -151,6 +129,15 @@ export default {
     await deleteNote(payload).then(result => {
       console.log(result);
     }).catch((error)=>{
+      console.log(error);
+    })
+  },
+
+  async deleteModule(context, payload){
+    const deleteModule = httpsCallable(functions, 'deleteModule');
+    await deleteModule(payload).then(result => {
+      console.log(result);
+    }).catch((error) => {
       console.log(error);
     })
   }

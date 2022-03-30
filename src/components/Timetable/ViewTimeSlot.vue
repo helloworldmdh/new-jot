@@ -149,11 +149,22 @@ export default {
       }
       return day_name;
     },
+    validateEditForm(){
+      if (!this.slotInEdit.title || this.slotInEdit.title.trim().length <= 0) {
+        alert('please don\'t leave the title blank!');
+        return false
+      }
+      if (this.slotInEdit.length <= 0) {
+        alert('make sure the times are valid!');
+        return false;
+      }
+      return true;
+    },
     convertTime(mins) {
       let h = Math.floor(mins / 60);
       let m = mins % 60;
-      h = h < 10 ? "0" + h : h; // (or alternatively) h = String(h).padStart(2, '0')
-      m = m < 10 ? "0" + m : m; // (or alternatively) m = String(m).padStart(2, '0')
+      h = h < 10 ? "0" + h : h; 
+      m = m < 10 ? "0" + m : m;
       return h + ":" + m;
     },
     edit() {
@@ -167,8 +178,8 @@ export default {
         b: parseInt(result[3], 16)
       } : null;
     },
-    async updateSlot(){ //Object.is(ob1, ob2) -> true if equal, false if not
-      //await this.$store.dispatch('addModule', this.moduleInEdit);
+    async updateSlot(){
+      if (!this.validateEditForm()) return;
       let loader = this.$loading.show({
         loader: 'dots',
         container: this.$refs["dialog_container"],

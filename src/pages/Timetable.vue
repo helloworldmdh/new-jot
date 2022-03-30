@@ -1,13 +1,13 @@
 <template>
 <div id="main_container">
   <add-module-menu :show="showDialogBox" @close="closeBox" @updateTable="updateTableAndClose"></add-module-menu>
-  <a class="floating-btn" @click="openBox">+</a>
+  <a class="floating_btn" @click="openBox">+</a>
   <view-time-slot :show="slotSelect" @closeModuleMenu="unselect" 
     :selected="slotSelect"
     :currSlot="selectedSlot"
   />
   <div class="timetable">
-    <div class="time-column">
+    <div class="time_column">
         <time-slot v-for="i in 24" :key="i" :id="i"
         :lectureTitle="i-1+':00'"
         :length="60"
@@ -61,7 +61,7 @@ export default {
   methods: {
     dayStyle(day) {
       if (day == this.currentDay)
-        return 'day-today'
+        return 'day_today'
       return 'day'
     },
 
@@ -251,7 +251,7 @@ export default {
 
 
 <style scoped>
-.floating-btn{
+.floating_btn{
   width: 80px;
   height: 80px;
   background: var(--main-color);
@@ -271,7 +271,7 @@ export default {
   cursor: pointer;
 }
 
-.floating-btn:active {
+.floating_btn:active {
   background: #4593b8;
 }
 
@@ -286,7 +286,7 @@ export default {
   height: 90em;
   border-width: 2px;
 }
-.time-column{
+.time_column{
   width: 9%;
   float: left;
   text-align: left;
@@ -297,7 +297,7 @@ export default {
   border-width: 2px;
 }
 
-.day-today{
+.day_today{
   width: 13%;
   float: left;
   text-align: left;
