@@ -131,7 +131,6 @@ img {
   display: block;
   font-size: var(--normal-font-size);
   text-align: center;
-  margin-bottom: .7em;
   transition: .5s;
   color: white;
 }
@@ -151,7 +150,7 @@ img {
 
 #icon-style{
   font-size: 40px;
-  margin-bottom: 1.2em;
+  margin-bottom: 0.75em;
   text-decoration: none;
 }
 

@@ -30,7 +30,7 @@
           <p v-if="!formIsValid">
             ERROR! Please make sure you provide {{ mustProvide }}
           </p>
-          <p v-if="error">Error: {{ error }}</p>
+          <div class="error_style" v-if="error">Error: {{ error }}</div>
           <button type="submit" class="submit-btn" @click="submitDetails">
             Submit
           </button>
@@ -157,7 +157,6 @@ export default {
   background: url(../assets/img/landing.jpg) no-repeat;
   height: 100vh;
   background-size: auto auto;
-  color: #14142c;
 }
 
 .header {
@@ -189,6 +188,10 @@ export default {
 }
 .login_title {
   font-size: 40px;
+}
+
+.error_style {
+  color: red;
 }
 
 .page_form {
